@@ -48,11 +48,10 @@ class FileSelectionTab:
         imageFolderSelectionButton = tk.Button(selectionPanel, image=self._folderIcon,
                                                command=lambda: setFolderPath(self._imageFolderVar))
 
-        self._outputFolderVar = tk.StringVar()
         outputFolderLabel = tk.Label(selectionPanel, text="Output folder: ")
-        outputFolderEntry = tk.Entry(selectionPanel, textvariable=self._outputFolderVar)
+        outputFolderEntry = tk.Entry(selectionPanel, textvariable=self._aoeGUI.outputFolderPathVar)
         outputFolderSelectionButton = tk.Button(selectionPanel, image=self._folderIcon,
-                                                command=lambda: setFolderPath(self._outputFolderVar))
+                                                command=lambda: setFolderPath(self._aoeGUI.outputFolderPathVar))
 
         maskFolderPanel = tk.LabelFrame(selectionPanel, text="Image masks")
         maskFolderPanel.grid_columnconfigure(1, weight=1)
@@ -117,6 +116,6 @@ class FileSelectionTab:
         self._aoeGUI.getOverlayElement().ImageFileManager = fileManager
 
         self._aoeGUI.getOverlayElement().loadConfiguration(
-            self._imageFolderVar.get(), maskFolderPath, self._outputFolderVar.get(),
+            self._imageFolderVar.get(), maskFolderPath,
             self._overlayPanel.getOverlayImages()
         )

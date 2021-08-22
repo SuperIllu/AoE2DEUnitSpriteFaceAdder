@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import messagebox
 import tkinter.ttk as ttk
 
+from fileSelectionTab.fileSelectionTab import setFolderPath
 from imageConfigManager import ImageConfigurationManager
 from imageFileManager import ImageFileManager
 
@@ -19,10 +20,12 @@ class GlobalExportPanel:
         self._globalExportPanel.grid_rowconfigure(1, weight=1)
         self._globalExportPanel.grid_columnconfigure(1, weight=1)
 
-        self._outputFolderVar = tk.StringVar()
-        self._outputFolderVar.set("[No output folder selected]")
         filePathLabel = tk.Label(self._globalExportPanel, text="Output folder:")
-        filePathSelection = tk.Label(self._globalExportPanel, textvariable=self._outputFolderVar, bg="white")
+        filePathSelection = tk.Label(self._globalExportPanel, width=10, anchor="e",
+                                     textvariable=self._modificationElement.masterGUI.outputFolderPathVar, bg="white")
+        self._folderIcon = tk.PhotoImage(file="./imgs/folder-icon_22.png")
+        outputFolderSelectionButton = tk.Button(self._globalExportPanel, image=self._folderIcon,
+                                                command=self._updateOutputFolder)
 
         exportAllButton = tk.Button(self._globalExportPanel, text="Export all", command=self._exportAll)
         infoLabel = tk.Label(self._globalExportPanel, text="This will override all files in the output folder",
@@ -31,9 +34,13 @@ class GlobalExportPanel:
 
         filePathLabel.grid(row=0, column=0, sticky="news", padx=(5, 5), pady=(5, 5))
         filePathSelection.grid(row=0, column=1, sticky="news", padx=(5, 5), pady=(5, 5))
+        outputFolderSelectionButton.grid(row=0, column=2, padx=(2, 5), pady=(5, 5))
         infoLabel.grid(row=1, column=1, sticky="news", padx=(5, 5), pady=(5, 5))
         exportAllButton.grid(row=1, column=0, padx=(5, 5), pady=(5, 5))
-        self._progressBar.grid(row=2, column=0, columnspan=2, sticky="news", pady=(2, 2), padx=(5, 5))
+        self._progressBar.grid(row=2, column=0, columnspan=3, sticky="news", pady=(2, 2), padx=(5, 5))
+
+    def _updateOutputFolder(self):
+        setFolderPath(self._modificationElement.masterGUI.outputFolderPathVar)
 
     def getFrame(self):
         return self._globalExportPanel

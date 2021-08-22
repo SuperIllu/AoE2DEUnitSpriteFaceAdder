@@ -15,7 +15,7 @@ class HoldBindCommand:
             HoldBindCommand._runSemaphore = True
             while HoldBindCommand._runSemaphore:
                 command()
-                time.sleep(0.15)
+                time.sleep(0.125)
 
         def _stop():
             HoldBindCommand._runSemaphore = False

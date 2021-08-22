@@ -28,6 +28,8 @@ class AoeUnitGui:
         self._tabs.add(self._filesTab, text="Files")
         self._tabs.add(self._overlayTab, text="Overlay")
 
+        self.outputFolderPathVar = tk.StringVar()
+
         self._fileSelectionElement = FileSelectionTab(self, self._filesTab)
         self._overlayElement = ModificationElement(self, self._overlayTab)
 

@@ -18,11 +18,14 @@ class ModificationElement:
         self._aoeGUI = aoeGUI
         self._parentFrame = parentFrame
         self._imageFileManager = None
-        self._imageConfigManager:ImageConfigurationManager = None
+        self._imageConfigManager: ImageConfigurationManager = None
         self._buildUI()
 
         self._selectedFile = None
-        self._outputFolderPath = None
+
+    @property
+    def masterGUI(self):
+        return self._aoeGUI
 
     @property
     def ImageFileManager(self):
@@ -116,10 +119,9 @@ class ModificationElement:
         selectedKey = self._selectedOverlayVar.get()
         return (selectedKey, self._overlayImages[selectedKey])
 
-    def loadConfiguration(self, imageFolderPath: str, maskFolderPath: str, outputFolderPath: str, overlayImages:dict):
+    def loadConfiguration(self, imageFolderPath: str, maskFolderPath: str, overlayImages:dict):
         self._imageFolderPath = imageFolderPath
         self._maskFolderPath = maskFolderPath
-        self._outputFolderPath = outputFolderPath
         self._overlayImages = overlayImages
 
         self._overlaySelectionDropdown.children["menu"].delete(0, tk.END)
@@ -134,7 +136,7 @@ class ModificationElement:
         self._imageList.loadImageList(imageFolderPath)
 
     def getOutputFolderPath(self):
-        return self._outputFolderPath
+        return self._aoeGUI.outputFolderPathVar.get()
 
     def getSelectedFile(self):
         return self._selectedFile
