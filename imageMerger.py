@@ -1,5 +1,5 @@
 import PIL
-from PIL import Image, ImageTk
+from PIL import Image
 
 
 def mergeImages(baseImage: Image, overlay: Image, offset: tuple[int, int]) -> PIL.Image:
@@ -53,15 +53,17 @@ def createResultImage(image: Image, mask: Image):
     return outputImage
 
 
-def generateDeltaMask(image: Image, modifiedImage: Image, shadow: Image) -> Image:
-    newShadow = shadow.copy()
-    imagePixels = image.load()
+def generateDeltaMask(originalImage: Image, modifiedImage: Image, originalMask: Image) -> Image:
+    """ Creates a new mask, which shows all the new pixels in the modified Image which are new compared
+     to the original image"""
+    newMask = originalMask.copy()
+    imagePixels = originalImage.load()
     modifiedImagePixels = modifiedImage.load()
-    newShadowPixels = newShadow.load()
+    newMaskPixels = newMask.load()
 
-    for xPixel in range(0, image.size[0]):
-        for yPixel in range(0, image.size[1]):
+    for xPixel in range(0, originalImage.size[0]):
+        for yPixel in range(0, originalImage.size[1]):
             if modifiedImagePixels[xPixel, yPixel] != imagePixels[xPixel, yPixel]:
-                newShadowPixels[xPixel, yPixel] = (255, 255, 255)
+                newMaskPixels[xPixel, yPixel] = (255, 255, 255)
 
-    return newShadow
+    return newMask

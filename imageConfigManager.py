@@ -1,5 +1,5 @@
 from PIL import Image
-from fileSelectionTab.imageMerger import mergeImages, generateDeltaMask
+from imageMerger import mergeImages, generateDeltaMask
 from imageFileManager import ImageFileManager
 
 

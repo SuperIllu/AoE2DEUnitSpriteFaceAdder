@@ -1,8 +1,8 @@
-from PIL import Image, ImageTk
+from PIL import Image
 import tkinter as tk
 
-from Functions import loadImagePathToCanvas, loadImageToCanvas
-from fileSelectionTab.imageMerger import mergeImages, createResultImage, generateDeltaMask
+from Functions import loadImageToCanvas
+from imageMerger import mergeImages, createResultImage, generateDeltaMask
 from imageConfigManager import ImageConfiguration
 from imageInspector import linkImageInspector
 

@@ -74,10 +74,8 @@ class GlobalExportPanel:
         else:
             self._startExporting()
 
-
     def _startExporting(self):
         threading.Thread(target=self._exportAllThreading).start()
-
 
     def _exportSingleImage(self, imageName: str):
         imageFileManager: ImageFileManager = self._modificationElement.ImageFileManager
