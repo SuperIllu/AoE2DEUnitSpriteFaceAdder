@@ -1,0 +1,1 @@
+You need to have the imgs folder next to the exe file, otherwise it won't work.
