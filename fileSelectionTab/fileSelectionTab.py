@@ -1,5 +1,7 @@
+import os
 import tkinter as tk
 import tkinter.filedialog
+import tkinter.messagebox
 import tkinter.ttk as ttk
 
 from fileSelectionTab.overlayImageSelection import OverlayImageSelectionPanel
@@ -22,7 +24,7 @@ class FileSelectionTab:
     def _buildUI(self):
         self._parentFrame.grid_columnconfigure(0, weight=1)
         self._parentFrame.grid_columnconfigure(1, weight=1)
-        self._parentFrame.grid_rowconfigure(0, weight=1)
+        self._parentFrame.grid_rowconfigure(0, weight=2)
         self._parentFrame.grid_rowconfigure(1, weight=2)
 
         self._folderIcon = tk.PhotoImage(file="./imgs/folder-icon_22.png")
@@ -87,8 +89,27 @@ class FileSelectionTab:
 
     def _buildButtonPanel(self):
         buttonPanel = tk.LabelFrame(self._parentFrame, text=" ")
+        buttonPanel.grid_columnconfigure(0, weight=1)
+        buttonPanel.grid_rowconfigure(5, weight=1)
         loadButton = tk.Button(buttonPanel, text="Load", command=self._loadIntoOverlayTab)
-        loadButton.pack()
+
+        self._imagesLoadedVar = tk.StringVar()
+        self._masksLoadedVar = tk.StringVar()
+        self._overlayImagesVar = tk.StringVar()
+        self._loadSummaryVar = tk.StringVar()
+
+        imagesLoadedLabel = tk.Label(buttonPanel, textvariable=self._imagesLoadedVar, width=10, anchor="w")
+        masksLoadedLabel = tk.Label(buttonPanel, textvariable=self._masksLoadedVar, width=10, anchor="w")
+        overlayImagesLabel = tk.Label(buttonPanel, textvariable=self._overlayImagesVar, width=10, anchor="w")
+        loadSummaryLabel = tk.Label(buttonPanel, textvariable=self._loadSummaryVar, width=10, anchor="center")
+        self._loadSummaryDetailTextArea = tk.Text(buttonPanel, width=10)
+
+        loadButton.grid(row=0, column=0, pady=(10, 5))
+        imagesLoadedLabel.grid(row=1, column=0, sticky="news", pady=(10, 5))
+        masksLoadedLabel.grid(row=2, column=0, sticky="news", pady=(10, 5))
+        overlayImagesLabel.grid(row=3, column=0, sticky="news", pady=(10, 5))
+        loadSummaryLabel.grid(row=4, column=0, sticky="news", pady=(5, 5))
+        self._loadSummaryDetailTextArea.grid(row=5, column=0, sticky="news", pady=(5, 5), padx=(5, 5))
 
         buttonPanel.grid(row=1, column=1, sticky="news", pady=(5, 5), padx=(5, 5))
 
@@ -103,15 +124,15 @@ class FileSelectionTab:
         else:
             maskFolderPath = self._imageFolderVar.get()
 
+        if not os.path.exists(self._imageFolderVar.get()):
+            tk.messagebox.showwarning("No image folder", "You need to set an image folder path")
+            return
+
         fileManager = ImageFileManager(self._imageFolderVar.get(), maskFolderPath,
                                        self._overlayPanel.getOverlayImages())
         consistencyCheck = fileManager.checkFileToMapConsitency()
-        if len(consistencyCheck[0]) != 0:
-            print(f"[WARN] Images missing masks: {consistencyCheck[0]}")
-        if len(consistencyCheck[1]) != 0:
-            print(f"[WARN] Masks missing images: {consistencyCheck[1]}")
-        if not consistencyCheck[2]:
-            print("[ERROR] no overlay images selected")
+        if not self.setStatusMessagesAfterLoad(fileManager, consistencyCheck):
+            return
 
         self._aoeGUI.getOverlayElement().ImageFileManager = fileManager
 
@@ -119,3 +140,40 @@ class FileSelectionTab:
             self._imageFolderVar.get(), maskFolderPath,
             self._overlayPanel.getOverlayImages()
         )
+
+    def setStatusMessagesAfterLoad(self, fileManager, consistencyCheck) -> bool:
+        consistencyCheck = fileManager.checkFileToMapConsitency()
+        noIssues = fileManager.evaluateCheckResult(consistencyCheck)
+
+        imagesLoaded = len(fileManager.getAllImageNames())
+
+        imagesLoadedMsg = f"Images loaded: \t\t{imagesLoaded}"
+        self._imagesLoadedVar.set(imagesLoadedMsg)
+        masksLoadedMsg = f"Masks loaded: \t\t{len(fileManager.getAllMaskNames())}"
+        self._masksLoadedVar.set(masksLoadedMsg)
+        overlaysLoadedMsg = f"Overlay images load: \t{len(self._overlayPanel.getOverlayImages().keys())}"
+        self._overlayImagesVar.set(overlaysLoadedMsg)
+
+        if noIssues:
+            if imagesLoaded == 0:
+                self._loadSummaryVar.set("Nothing loaded...")
+                return False
+            else:
+                self._loadSummaryVar.set("No issues found in loading")
+        else:
+            self._loadSummaryVar.set("Missing images detected!")
+
+        self._loadSummaryDetailTextArea.delete("1.0", tk.END)
+        if not consistencyCheck[2]:
+            self._loadSummaryDetailTextArea.insert(tk.END, "No overlay images loaded\n")
+        if len(consistencyCheck[0]) != 0:
+            missingMasks = "\n> ".join(consistencyCheck[0])
+            self._loadSummaryDetailTextArea.insert(tk.END, f"No masks found for images:\n {missingMasks}\n")
+            print(f"[WARN] Images missing masks: {consistencyCheck[0]}")
+        if len(consistencyCheck[1]) != 0:
+            missingImages = "\n> ".join(consistencyCheck[1])
+            self._loadSummaryDetailTextArea.insert(tk.END, f"No images found for masks:\n {missingImages}")
+            print(f"[WARN] Masks missing images: {consistencyCheck[1]}")
+
+
+        return True

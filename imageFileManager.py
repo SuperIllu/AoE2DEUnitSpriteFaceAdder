@@ -31,8 +31,10 @@ class ImageFileManager:
 
         self.load()
 
-    def load(self):
+    def load(self) -> bool:
         """ creates the internal maps for images->filepath and mask->filepath """
+        if not os.path.exists(self._imageFileFolder) or not os.path.exists(self._maskFileFolder):
+            return False
         imageFiles = os.listdir(self._imageFileFolder)
         for file in imageFiles:
             fullPath = f"{self._imageFileFolder}{os.path.sep}{file}"
@@ -52,6 +54,7 @@ class ImageFileManager:
             if not file.lower().endswith("d.bmp"):
                 continue
             self._maskMap[file] = fullPath
+        return True
 
     def checkFileToMapConsitency(self) -> tuple[list, list, bool]:
         """ returns a tuple of lists:
@@ -80,4 +83,7 @@ class ImageFileManager:
 
     def getAllImageNames(self) -> list[str]:
         return list(self._imageMap.keys())
+
+    def getAllMaskNames(self) -> list[str]:
+        return list(self._maskMap.keys())
 
