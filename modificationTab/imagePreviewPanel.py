@@ -82,22 +82,23 @@ class ImagePreviewPanel:
     def loadImage(self, configuration: ImageConfiguration):
         """ Called (indirectly) from the list element """
         self._imageConfiguration = configuration
-        self._baseImage, self._baseMask = self._modificationPanel.ImageConfigManager.getImageAndMask(configuration.image)
+        self._baseImage, self._baseMask = \
+            self._modificationPanel.ImageConfigManager.getImageAndMask(configuration.image)
 
         self._scaledBaseImage, self._scaledBasePhotoimage = \
             loadImageToCanvas(self._baseImage, self._baseImageCanvas)
 
+        if self._baseMask:
+            self._scaledBaseMaskImage, self._scaledBaseMaskPhotoimage = \
+                loadImageToCanvas(self._baseMask, self._baseMaskCanvas)
+            linkImageInspector(self._baseMaskCanvas, self._baseMask)
+
+            resultImage = createResultImage(self._baseImage, self._baseMask)
+            self._scaledBaseResultImage, self._scaledBaseResultPhotoimage = \
+                loadImageToCanvas(resultImage, self._baseResultCanvas)
+            linkImageInspector(self._baseResultCanvas, self._scaledBaseResultImage)
 
         linkImageInspector(self._baseImageCanvas, self._baseImage)
-        linkImageInspector(self._baseMaskCanvas, self._baseMask)
-
-
-        self._scaledBaseMaskImage, self._scaledBaseMaskPhotoimage = \
-            loadImageToCanvas(self._baseMask, self._baseMaskCanvas)
-
-        resultImage = createResultImage(self._baseImage, self._baseMask)
-        self._scaledBaseResultImage, self._scaledBaseResultPhotoimage = \
-            loadImageToCanvas(resultImage, self._baseResultCanvas)
 
         self._updateMergedImage()
 

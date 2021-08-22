@@ -164,15 +164,19 @@ class FileSelectionTab:
             self._loadSummaryVar.set("Missing images detected!")
 
         self._loadSummaryDetailTextArea.delete("1.0", tk.END)
+        outputFolder = self._aoeGUI.outputFolderPathVar.get()
+        if not outputFolder or not os.path.exists(outputFolder):
+            self._loadSummaryDetailTextArea.insert(tk.END, f"Missing output folder\n\n")
+
         if not consistencyCheck[2]:
-            self._loadSummaryDetailTextArea.insert(tk.END, "No overlay images loaded\n")
+            self._loadSummaryDetailTextArea.insert(tk.END, "No overlay images loaded\n\n")
         if len(consistencyCheck[0]) != 0:
             missingMasks = "\n> ".join(consistencyCheck[0])
-            self._loadSummaryDetailTextArea.insert(tk.END, f"No masks found for images:\n {missingMasks}\n")
+            self._loadSummaryDetailTextArea.insert(tk.END, f"No masks found for images:\n {missingMasks}\n\n")
             print(f"[WARN] Images missing masks: {consistencyCheck[0]}")
         if len(consistencyCheck[1]) != 0:
             missingImages = "\n> ".join(consistencyCheck[1])
-            self._loadSummaryDetailTextArea.insert(tk.END, f"No images found for masks:\n {missingImages}")
+            self._loadSummaryDetailTextArea.insert(tk.END, f"No images found for masks:\n {missingImages}\n\n")
             print(f"[WARN] Masks missing images: {consistencyCheck[1]}")
 
 

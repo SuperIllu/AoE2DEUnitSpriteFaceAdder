@@ -55,7 +55,8 @@ class ImageConfigurationManager:
         """ Returns new, unmodified images """
         fullImagePath = self._fileManager.getFullImagePath(imageName)
         maskName, maskPath = self._fileManager.getMaskToImage(imageName)
-        return Image.open(fullImagePath), Image.open(maskPath)
+        maskImage = Image.open(maskPath) if maskPath else None
+        return Image.open(fullImagePath), maskImage
 
     def generateImagesToExport(self, imageName: str) -> tuple[Image, Image]:
         """ Generates both image and mask to be exported """
