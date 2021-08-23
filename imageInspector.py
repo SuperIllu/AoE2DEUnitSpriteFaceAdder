@@ -5,18 +5,19 @@ from PIL import Image, ImageTk
 from Functions import loadImageToCanvas, calculatePreviewImageSize, getCanvasSize
 
 
-def linkImageInspector(element, image):
-    element.bind("<Button-2>", lambda event: ImageInspector(image))
+def linkImageInspector(element, image: Image, imageName: str):
+    element.bind("<Button-2>", lambda event: ImageInspector(image), imageName)
 
 
 class ImageInspector:
 
-    def __init__(self, image: Image):
+    def __init__(self, image: Image, imageName:str ="[Missing name]"):
         self._image = image
+        self._imageName = imageName
         self._pixels = image.load()
 
         self._main = tk.Toplevel()
-        self._main.title(f"Inspector: {image}")
+        self._main.title(f"Inspector: {imageName}")
         self._main.grid_rowconfigure(0, weight=1)
         self._main.grid_rowconfigure(1, weight=0)
         self._main.grid_columnconfigure(0, weight=1)
@@ -40,7 +41,7 @@ class ImageInspector:
 
     def _evaluateMousePosition(self, event):
         self._positionVar.set(f"Position {event.x} / {event.y}")
-        if 0 <= event.x <= self._resizedImage.size[0] and 0 <= event.y <= self._resizedImage.size[1]:
+        if 0 <= event.x < self._resizedImage.size[0] and 0 <= event.y < self._resizedImage.size[1]:
             self._colourVar.set(f"Colour {self._scaledPixels[event.x, event.y]}")
         else:
             self._colourVar.set("Colour: pixel out of range")

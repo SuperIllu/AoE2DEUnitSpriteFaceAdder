@@ -91,14 +91,14 @@ class ImagePreviewPanel:
         if self._baseMask:
             self._scaledBaseMaskImage, self._scaledBaseMaskPhotoimage = \
                 loadImageToCanvas(self._baseMask, self._baseMaskCanvas)
-            linkImageInspector(self._baseMaskCanvas, self._baseMask)
+            linkImageInspector(self._baseMaskCanvas, self._baseMask, "Base image")
 
             resultImage = createResultImage(self._baseImage, self._baseMask)
             self._scaledBaseResultImage, self._scaledBaseResultPhotoimage = \
                 loadImageToCanvas(resultImage, self._baseResultCanvas)
-            linkImageInspector(self._baseResultCanvas, self._scaledBaseResultImage)
+            linkImageInspector(self._baseResultCanvas, self._scaledBaseResultImage, "Base mask")
 
-        linkImageInspector(self._baseImageCanvas, self._baseImage)
+        linkImageInspector(self._baseImageCanvas, self._baseImage, "Base result")
 
         self._updateMergedImage()
 
@@ -106,7 +106,7 @@ class ImagePreviewPanel:
         if self._baseImage and self._overlayImage and self._overlayOffset:
 
             self._mergedImage = mergeImages(self._baseImage, self._overlayImage, self._overlayOffset)
-            # these are only temporary, need refernces to avoid GC
+            # these are only temporary, need references to avoid GC
             self._scaledMergedImage, self._scaledMergedPhotoimage = \
                 loadImageToCanvas(self._mergedImage, self._overlayImageCanvas)
 
@@ -115,12 +115,12 @@ class ImagePreviewPanel:
             else:
                 self._mergedMask = self._baseMask
 
-            # these are only temporary, need refernces to avoid GC
+            # these are only temporary, need references to avoid GC
             self._scaledMergedMask, self._scaledMergedMaskPhotoimage = \
                 loadImageToCanvas(self._mergedMask, self._overlayMaskCanvas)
 
             resultImage = createResultImage(self._mergedImage, self._mergedMask)
-            # these are only temporary, need refernces to avoid GC
+            # these are only temporary, need references to avoid GC
             self._mergedResultImage, self._mergedResultPhotoimage = \
                 loadImageToCanvas(resultImage, self._overlayResultCanvas)
 

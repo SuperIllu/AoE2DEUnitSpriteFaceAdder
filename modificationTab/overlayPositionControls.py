@@ -26,9 +26,10 @@ class HoldBindCommand:
 
 class OverlayPositionControls:
 
-    def __init__(self, parentFrame, previewPanel):
+    def __init__(self, parentFrame, previewPanel, aoeGUI):
         self._parentFrame = parentFrame
         self._previewPanel = previewPanel
+        self._aoeGUI = aoeGUI
         self._buildUI()
 
     def _buildUI(self):
@@ -63,12 +64,17 @@ class OverlayPositionControls:
         moveUpButton = tk.Button(positionModificationPanel, text="^", width=2, height=1)
         moveDownButton = tk.Button(positionModificationPanel, text="v", width=2, height=1)
         moveLeftButton = tk.Button(positionModificationPanel, text="<", width=2, height=1)
-        moveRightButton = tk.Button(positionModificationPanel, text=">", width=2, height=1,)
+        moveRightButton = tk.Button(positionModificationPanel, text=">", width=2, height=1)
 
         HoldBindCommand.bindHoldCommand(moveUpButton, lambda: self._moveOverlay("up"))
         HoldBindCommand.bindHoldCommand(moveDownButton, lambda: self._moveOverlay("down"))
         HoldBindCommand.bindHoldCommand(moveLeftButton, lambda: self._moveOverlay("left"))
         HoldBindCommand.bindHoldCommand(moveRightButton, lambda: self._moveOverlay("right"))
+
+        self._aoeGUI.getMain().bind("w", lambda event: self._moveOverlayViaKeys("up"))
+        self._aoeGUI.getMain().bind("a", lambda event: self._moveOverlayViaKeys("left"))
+        self._aoeGUI.getMain().bind("s", lambda event: self._moveOverlayViaKeys("down"))
+        self._aoeGUI.getMain().bind("d", lambda event: self._moveOverlayViaKeys("right"))
 
         moveUpButton.grid(row=0, column=1, padx=(2, 2), pady=(2, 2))
         moveLeftButton.grid(row=1, column=0, padx=(2, 2), pady=(2, 2))
@@ -85,6 +91,11 @@ class OverlayPositionControls:
 
     def getFrame(self):
         return self._positionPanel
+
+    def _moveOverlayViaKeys(self, direction):
+        tabs = self._aoeGUI.getTabs()
+        if tabs.index(tabs.select()) == 1:
+            self._moveOverlay(direction)
 
     def _moveOverlay(self, direction):
         newPosition = self._previewPanel.moveOverlay(direction)

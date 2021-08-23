@@ -51,6 +51,8 @@ class ModificationElement:
 
         self._overlayPanel.grid_columnconfigure(0, weight=1)
 
+        self._overlayPanel.bind('<Return>', lambda event: print("Enter"))
+
         self._buildFileInfoPanel()
         self._buildPreviewPanel()
         self._buildOverlayPanel()
@@ -64,7 +66,7 @@ class ModificationElement:
         self._controlPanel.grid_columnconfigure(1, weight=1)
         self._controlPanel.grid(row=3, column=0, columnspan=3, sticky="news")
 
-        self._maskPositionPanel = OverlayPositionControls(self._controlPanel, self._previewPanel)
+        self._maskPositionPanel = OverlayPositionControls(self._controlPanel, self._previewPanel, self._aoeGUI)
         self._maskPositionPanel.getFrame().grid(row=0, column=0, sticky="news")
         self._localExportPanel = LocalExportPanel(self._controlPanel, self, self._previewPanel)
         self._localExportPanel.getFrame().grid(row=0, column=1, sticky="news")

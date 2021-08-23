@@ -80,7 +80,8 @@ class OverlayImageSelectionPanel:
     def _previewImage(self, filePath):
         try:
             print(f"Preview image: {filePath}")
-            self._previewImage, self._previewPhotoImage = loadImagePathToCanvas(filePath, self._overlayImagesPreview)
+            self._selectedPreviewImage, self._selectedPreviewPhotoImage = \
+                loadImagePathToCanvas(filePath, self._overlayImagesPreview)
         except Exception as e:
             print(e)
 
