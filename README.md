@@ -1,5 +1,5 @@
 # CHUM
-## CHon's Unit Modifier
+## CHonk's Unit Modifier
 
 CHUM is a python tool that can help you to add your face to a unit in AoE2:DE. 
 
