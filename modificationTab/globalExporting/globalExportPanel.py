@@ -7,6 +7,7 @@ import tkinter.ttk as ttk
 from fileSelectionTab.fileSelectionTab import setFolderPath
 from imageConfigManager import ImageConfigurationManager
 from imageFileManager import ImageFileManager
+from modificationTab.globalExporting.globalExportConfirmation import GlobalExportConfirmation
 
 
 class GlobalExportPanel:
@@ -45,14 +46,16 @@ class GlobalExportPanel:
     def getFrame(self):
         return self._globalExportPanel
 
-    def _exportAllThreading(self):
+    def _exportThreading(self):
         imageFileManager: ImageFileManager = self._modificationElement.ImageFileManager
         configManager: ImageConfigurationManager = self._modificationElement.ImageConfigManager
         sortedImageNames = sorted(imageFileManager.getAllImageNames())
+        self._exportSelectedImages(sortedImageNames)
 
+    def _exportSelectedImages(self, selectedImages):
         processedImages = 0
-        totalImages = len(sortedImageNames)
-        for image in sortedImageNames:
+        totalImages = len(selectedImages)
+        for image in selectedImages:
             self._exportSingleImage(image)
             processedImages += 1
             progress = 100*(processedImages / totalImages)
@@ -69,20 +72,19 @@ class GlobalExportPanel:
 
         imageFileManager: ImageFileManager = self._modificationElement.ImageFileManager
         configManager: ImageConfigurationManager = self._modificationElement.ImageConfigManager
-        allImageNames = imageFileManager.getAllImageNames()
-        imagesWithoutConfig = \
-            [imageName for imageName in allImageNames if not configManager.hasConfiguration(imageName)]
-        if len(imagesWithoutConfig) > 0:
-            message = f"{len(imagesWithoutConfig)} do not have an overlay configuration. " \
-                      f"They will be exported without changes.\n" \
-                      f"Continue?"
-            if tk.messagebox.askokcancel("Missing configuration", message):
-                self._startExporting()
+        allImageNames = sorted(imageFileManager.getAllImageNames())
+        imagesWithConfig = \
+            [imageName for imageName in allImageNames if configManager.hasConfiguration(imageName)]
+        if len(imagesWithConfig) < len(allImageNames):
+            # not all images are configured
+            exportAllCallback = lambda: self._startExporting(allImageNames)
+            exportModified = lambda: self._startExporting(imagesWithConfig)
+            GlobalExportConfirmation(len(allImageNames), len(imagesWithConfig), exportAllCallback, exportModified)
         else:
-            self._startExporting()
+            self._startExporting(allImageNames)
 
-    def _startExporting(self):
-        threading.Thread(target=self._exportAllThreading).start()
+    def _startExporting(self, imagesToExport):
+        threading.Thread(target=self._exportSelectedImages, args=(imagesToExport,)).start()
 
     def _exportSingleImage(self, imageName: str):
         imageFileManager: ImageFileManager = self._modificationElement.ImageFileManager

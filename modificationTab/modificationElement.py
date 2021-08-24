@@ -4,7 +4,7 @@ import tkinter as tk
 from imageConfigManager import ImageConfigurationManager
 from modificationTab.fileInfoPanel import FileInfoPanel
 from modificationTab.fileListPanel import FileListPanel
-from modificationTab.globalExportPanel import GlobalExportPanel
+from modificationTab.globalExporting.globalExportPanel import GlobalExportPanel
 from modificationTab.imagePreviewPanel import ImagePreviewPanel
 from modificationTab.localExportPanel import LocalExportPanel
 from modificationTab.overlayImageSelection import OverlaySelectionPanel
