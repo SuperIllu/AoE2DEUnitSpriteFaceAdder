@@ -20,7 +20,8 @@ CHUM is a python tool that can help you to add your face to a unit in AoE2:DE.
 
 
 ## Getting started with CHUM
-Start the .exe, but make sure that the `imgs` folder is in the same location as the .exe.
+You can start the main.py script via `python main.py` (python3 required) or find a Windows executable in the `dist` folder.
+If you start the .exe, make sure that the `imgs` folder is in the same location as the .exe.
 Select the input folder that contains the exported bmps.
 Select all face pictures to be overlaid over the unit sprites.
 Select the output folder, I recommend a new, empy one.
