@@ -59,11 +59,13 @@ class FileListPanel:
 
         for file in sorted(self._validFiles.keys()):
             self._listBox.insert(tk.END, file)
+            self._listBox.itemconfig(tk.END, bg="white")
 
     def _onFileSelected(self, event):
         selectionIndex = self._listBox.curselection()
         if len(selectionIndex) != 1:
             return
+        self._listBox.itemconfig(selectionIndex[0], bg="DarkSeaGreen1")
         imageSelection = self._listBox.get(selectionIndex[0])
         fullImagePath = self._validFiles.get(imageSelection, None)
 
