@@ -18,6 +18,16 @@ class FileListPanel:
         self._mainPanel.grid_columnconfigure(1, weight=0)
         self._mainPanel.grid_rowconfigure(0, weight=1)
 
+        infoPanel = tk.Frame(self._mainPanel)
+        infoPanel.grid_columnconfigure(0, weight=1)
+        infoPanel.grid_rowconfigure(0, weight=1)
+        self._imageNumberVar = tk.StringVar()
+        self._onlyPreviewVar = tk.BooleanVar()
+        imageNumberLabel = tk.Label(infoPanel, textvariable=self._imageNumberVar, anchor="w")
+        onlyPreviewCheckbox = tk.Checkbutton(infoPanel, variable=self._onlyPreviewVar)
+        imageNumberLabel.grid(row=0, column=0, sticky="news")
+
+
         self._listBox = tk.Listbox(self._mainPanel)
         self._scrollBar = tk.Scrollbar(self._mainPanel)
         self._listBox.config(yscrollcommand=self._scrollBar.set)
@@ -27,6 +37,7 @@ class FileListPanel:
 
         self._listBox.grid(row=0, column=0, sticky="news")
         self._scrollBar.grid(row=0, column=1, sticky="news")
+        infoPanel.grid(row=1, column=0, sticky="news")
 
     def getFrame(self):
         return self._mainPanel
@@ -43,6 +54,8 @@ class FileListPanel:
             if file.lower().endswith("d.bmp"):
                 continue
             self._validFiles[file] = fullPath
+
+        self._imageNumberVar.set(f"Loaded images: {len(self._validFiles.keys())}")
 
         for file in sorted(self._validFiles.keys()):
             self._listBox.insert(tk.END, file)

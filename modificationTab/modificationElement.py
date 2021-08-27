@@ -1,7 +1,8 @@
 import os
 import tkinter as tk
+from typing import Optional
 
-from imageConfigManager import ImageConfigurationManager
+from imageConfigManager import ImageConfigurationManager, ImageConfiguration
 from modificationTab.fileInfoPanel import FileInfoPanel
 from modificationTab.fileListPanel import FileListPanel
 from modificationTab.globalExporting.globalExportPanel import GlobalExportPanel
@@ -17,7 +18,8 @@ class ModificationElement:
         self._aoeGUI = aoeGUI
         self._parentFrame = parentFrame
         self._imageFileManager = None
-        self._imageConfigManager: ImageConfigurationManager = None
+        self._imageConfigManager: Optional[ImageConfigurationManager] = None
+        self._imageConfiguration: Optional[ImageConfiguration] = None
         self._buildUI()
 
         self._selectedFile = None
@@ -106,7 +108,8 @@ class ModificationElement:
     def loadImage(self, fileName, fullImagePath):
         """ called from the list when selecting an image """
         self._selectedFile = (fileName, fullImagePath)
-        self._imageConfiguration = self._imageConfigManager.getConfiguration(self._selectedFile[0])
+        self._imageConfiguration = self._imageConfigManager.getConfiguration(self._selectedFile[0],
+                                                                             self._imageConfiguration)
         _, fullMaskPath = self._imageFileManager.getMaskToImage(fileName)
         self._fileInfoPanel.loadFilePaths(fullImagePath, fullMaskPath)
         self._previewPanel.loadImage(self._imageConfiguration)

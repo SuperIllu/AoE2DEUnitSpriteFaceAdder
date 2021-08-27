@@ -16,8 +16,8 @@ class ImagePreviewPanel:
         self._modificationPanel = modificationPanel
         self._parentFrame = parentFrame
         self._buildUI()
-        self._baseImage = None
-        self._overlayImage = None
+        self._baseImage: Image = None
+        self._overlayImage: Image = None
         self._overlayOffset = None
         self._overlayImageName = None
         self._mergedImage = None
@@ -59,7 +59,8 @@ class ImagePreviewPanel:
         self._autoGenerateOverlayMaskVar = tk.BooleanVar()
         self._autoGenerateOverlayMaskVar.set(True)
         autoGenerateOverlayMaskCheckbox = tk.Checkbutton(self._previewPanel, text="Auto generate overlay mask",
-                                                         variable=self._autoGenerateOverlayMaskVar)
+                                                         variable=self._autoGenerateOverlayMaskVar,
+                                                         command=self._updateAutoGenerateFlag)
 
         baseImageLabel.grid(row=0, column=0)
         baseMaskLabel.grid(row=0, column=1)
@@ -80,11 +81,17 @@ class ImagePreviewPanel:
     def getFrame(self):
         return self._previewPanel
 
+    def _updateAutoGenerateFlag(self):
+        if self._imageConfiguration:
+            self._imageConfiguration.autoGenerateShadow = self._autoGenerateOverlayMaskVar.get()
+            self._updateMergedImage()
+
     def loadImage(self, configuration: ImageConfiguration):
         """ Called (indirectly) from the list element """
         self._imageConfiguration = configuration
+        self._autoGenerateOverlayMaskVar.set(configuration.autoGenerateShadow)
         self._baseImage, self._baseMask = \
-            self._modificationPanel.ImageConfigManager.getImageAndMask(configuration.image)
+            self._modificationPanel.ImageConfigManager.getImageAndMask(configuration.imageName)
 
         self._scaledBaseImage, self._scaledBasePhotoimage = \
             loadImageToCanvas(self._baseImage, self._baseImageCanvas)
@@ -104,6 +111,7 @@ class ImagePreviewPanel:
         self._updateMergedImage()
 
     def _updateMergedImage(self):
+        """ creates new images when any overlay information is changed """
         if self._baseImage and self._overlayImage and self._overlayOffset:
 
             self._mergedImage = mergeImages(self._baseImage, self._overlayImage, self._overlayOffset)

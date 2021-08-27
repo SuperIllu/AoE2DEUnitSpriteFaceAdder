@@ -2,6 +2,10 @@ import PIL
 from PIL import Image
 
 
+def mergeImagesViaConfig(baseImage: Image, config) -> PIL.Image:
+    return mergeImages(baseImage, config.overlayImage, config.offset)
+
+
 def mergeImages(baseImage: Image, overlay: Image, offset: tuple[int, int]) -> PIL.Image:
     """ doesn't modify the input images, returns a new merged (unscaled) image """
     overlayPixels = overlay.load()

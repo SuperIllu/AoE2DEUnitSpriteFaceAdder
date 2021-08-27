@@ -1,37 +1,18 @@
+import dataclasses
+from typing import Optional
+
 from PIL import Image
 from imageMerger import mergeImages, generateDeltaMask
 from imageFileManager import ImageFileManager
+from dataclasses import dataclass
 
 
+@dataclass(order=True)
 class ImageConfiguration:
-
-    def __init__(self, image, overlayImage: str = None, offset: tuple[int, int] = None):
-        self._image = image
-        self._overlayImage = overlayImage
-        self._offset = offset
-
-    def __repr__(self):
-        return f"{self._image}-{self._offset}-{self._overlayImage}"
-
-    @property
-    def image(self):
-        return self._image
-
-    @property
-    def overlayImage(self):
-        return self._overlayImage
-
-    @overlayImage.setter
-    def overlayImage(self, overlayImage):
-        self._overlayImage = overlayImage
-
-    @property
-    def offset(self):
-        return self._offset
-
-    @offset.setter
-    def offset(self, offset):
-        self._offset = offset
+    imageName: Image
+    overlayImage: Image = None
+    offset: tuple[int, int] = (0, 0)
+    autoGenerateShadow: bool = True
 
 
 class ImageConfigurationManager:
@@ -46,9 +27,13 @@ class ImageConfigurationManager:
     def hasConfiguration(self, imageName: str) -> bool:
         return imageName in self._configurationMap.keys()
 
-    def getConfiguration(self, imageName:str) -> ImageConfiguration:
+    def getConfiguration(self, imageName:str, configBlueprint: Optional[ImageConfiguration]) -> ImageConfiguration:
         if imageName not in self._configurationMap.keys():
-            self._configurationMap[imageName] = ImageConfiguration(imageName)
+            if configBlueprint:
+                imageConfig = dataclasses.replace(configBlueprint, imageName=imageName)
+            else:
+                imageConfig = ImageConfiguration(imageName)
+            self._configurationMap[imageName] = imageConfig
         return self._configurationMap.get(imageName, None)
 
     def getImageAndMask(self, imageName: str) -> tuple[Image, Image]:
