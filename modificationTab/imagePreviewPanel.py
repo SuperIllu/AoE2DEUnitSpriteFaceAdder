@@ -83,13 +83,13 @@ class ImagePreviewPanel:
 
     def _updateAutoGenerateFlag(self):
         if self._imageConfiguration:
-            self._imageConfiguration.autoGenerateShadow = self._autoGenerateOverlayMaskVar.get()
+            self._imageConfiguration.autoGenerateMask = self._autoGenerateOverlayMaskVar.get()
             self._updateMergedImage()
 
     def loadImage(self, configuration: ImageConfiguration):
         """ Called (indirectly) from the list element """
         self._imageConfiguration = configuration
-        self._autoGenerateOverlayMaskVar.set(configuration.autoGenerateShadow)
+        self._autoGenerateOverlayMaskVar.set(configuration.autoGenerateMask)
         self._baseImage, self._baseMask = \
             self._modificationPanel.ImageConfigManager.getImageAndMask(configuration.imageName)
 

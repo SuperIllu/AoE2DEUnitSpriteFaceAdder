@@ -12,7 +12,7 @@ class ImageConfiguration:
     imageName: Image
     overlayImage: Image = None
     offset: tuple[int, int] = (0, 0)
-    autoGenerateShadow: bool = True
+    autoGenerateMask: bool = True
 
 
 class ImageConfigurationManager:
@@ -27,7 +27,7 @@ class ImageConfigurationManager:
     def hasConfiguration(self, imageName: str) -> bool:
         return imageName in self._configurationMap.keys()
 
-    def getConfiguration(self, imageName:str, configBlueprint: Optional[ImageConfiguration]) -> ImageConfiguration:
+    def getConfiguration(self, imageName:str, configBlueprint: Optional[ImageConfiguration]=None) -> ImageConfiguration:
         if imageName not in self._configurationMap.keys():
             if configBlueprint:
                 imageConfig = dataclasses.replace(configBlueprint, imageName=imageName)
@@ -61,5 +61,8 @@ class ImageConfigurationManager:
             return (imageImage, maskImage)
 
         mergedImage: Image = mergeImages(imageImage, overlayImage, overlayImageOffset)
-        mergedMask: Image = generateDeltaMask(imageImage, mergedImage, maskImage)
+        if configuration.autoGenerateMask:
+            mergedMask: Image = generateDeltaMask(imageImage, mergedImage, maskImage)
+        else:
+            mergedMask:Image = maskImage
         return (mergedImage, mergedMask)
