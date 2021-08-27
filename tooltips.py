@@ -30,7 +30,6 @@ class BindTooltip:
             self._widget.after_cancel(id)
 
     def _showTooltip(self):
-        print (self._widget)
         x, y, cx, cy = self._widget.bbox("insert")
         x += self._widget.winfo_rootx() + 25
         y += self._widget.winfo_rooty() + 20
