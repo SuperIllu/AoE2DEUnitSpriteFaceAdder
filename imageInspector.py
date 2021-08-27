@@ -1,17 +1,16 @@
 import tkinter as tk
 
-from PIL import Image, ImageTk
-
+from PIL import Image
 from Functions import loadImageToCanvas, calculatePreviewImageSize, getCanvasSize
 
 
 def linkImageInspector(element, image: Image, imageName: str):
-    element.bind("<Button-2>", lambda event: ImageInspector(image), imageName)
+    element.bind("<Button-2>", lambda event: ImageInspector(image, imageName))
 
 
 class ImageInspector:
 
-    def __init__(self, image: Image, imageName:str ="[Missing name]"):
+    def __init__(self, image: Image, imageName:str ):
         self._image = image
         self._imageName = imageName
         self._pixels = image.load()

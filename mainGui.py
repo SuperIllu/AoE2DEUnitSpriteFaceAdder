@@ -34,9 +34,11 @@ class AoeUnitGui:
         self._overlayElement = ModificationElement(self, self._overlayTab)
 
     def getMain(self):
+        """ returns tk.Tk(), mainly for keybinds """
         return self._main
 
     def getTabs(self):
+        """ returns the notebook (tab manager) """
         return self._tabs
 
     def getFileSelectionElement(self):

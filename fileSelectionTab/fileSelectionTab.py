@@ -6,6 +6,7 @@ import tkinter.ttk as ttk
 
 from fileSelectionTab.overlayImageSelection import OverlayImageSelectionPanel
 from imageFileManager import ImageFileManager
+from tooltips import BindTooltip
 
 
 def setFolderPath(stringVar: tk.StringVar):
@@ -110,6 +111,7 @@ class FileSelectionTab:
         overlayImagesLabel.grid(row=3, column=0, sticky="news", pady=(10, 5))
         loadSummaryLabel.grid(row=4, column=0, sticky="news", pady=(5, 5))
         self._loadSummaryDetailTextArea.grid(row=5, column=0, sticky="news", pady=(5, 5), padx=(5, 5))
+        BindTooltip(self._loadSummaryDetailTextArea, "Shows issues after paths have been loaded")
 
         buttonPanel.grid(row=1, column=1, sticky="news", pady=(5, 5), padx=(5, 5))
 

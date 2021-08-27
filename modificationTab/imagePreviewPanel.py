@@ -5,6 +5,7 @@ from Functions import loadImageToCanvas
 from imageMerger import mergeImages, createResultImage, generateDeltaMask
 from imageConfigManager import ImageConfiguration
 from imageInspector import linkImageInspector
+from tooltips import BindTooltip
 
 
 class ImagePreviewPanel:
@@ -154,7 +155,7 @@ class ImagePreviewPanel:
 
     def moveOverlay(self, direction) -> tuple[int, int]:
         direction = direction.lower()
-        directionMap = {"up": (0, -1), "down": (0, 1), "right":(1, 0), "left": (-1, 0)}
+        directionMap = {"up": (0, -1), "down": (0, 1), "right": (1, 0), "left": (-1, 0)}
         directionVector = directionMap.get(direction, None)
         if directionVector:
             self._overlayOffset = (self._overlayOffset[0] + directionVector[0],
