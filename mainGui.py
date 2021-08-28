@@ -9,6 +9,7 @@ class AoeUnitGui:
 
     def __init__(self):
         self._buildUI()
+        self._setIcon()
         self._startUI()
 
     def _buildUI(self):
@@ -32,6 +33,15 @@ class AoeUnitGui:
 
         self._fileSelectionElement = FileSelectionTab(self, self._filesTab)
         self._overlayElement = ModificationElement(self, self._overlayTab)
+
+    def _setIcon(self):
+        try:
+            self._icon = tk.PhotoImage(file="./imgs/piggie_cut_mug_32.png")
+            self._main.iconphoto(False, self._icon)
+        except Exception:
+            pass
+
+
 
     def getMain(self):
         """ returns tk.Tk(), mainly for keybinds """
