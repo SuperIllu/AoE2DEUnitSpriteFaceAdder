@@ -37,6 +37,7 @@ class OverlayImageSelectionPanel:
 
     def _addOverlayPictures(self):
         selections = tk.filedialog.askopenfilename(
+            title="Add overlay images",
             multiple=True, filetypes=[
                 ("image", "*.bmp"), ("image", "*.jpg"), ("image", "*.png"),
                 ("All", "*")])

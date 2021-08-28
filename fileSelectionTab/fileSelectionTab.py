@@ -9,8 +9,8 @@ from imageFileManager import ImageFileManager
 from tooltips import BindTooltip
 
 
-def setFolderPath(stringVar: tk.StringVar):
-    selection = tk.filedialog.askdirectory()
+def setFolderPath(stringVar: tk.StringVar, title: str="Select folder"):
+    selection = tk.filedialog.askdirectory(title=title)
     if selection:
         stringVar.set(selection)
 
@@ -49,12 +49,14 @@ class FileSelectionTab:
         imageFolderLabel = tk.Label(selectionPanel, text="Image folder: ")
         imageFolderEntry = tk.Entry(selectionPanel, textvariable=self._imageFolderVar)
         imageFolderSelectionButton = tk.Button(selectionPanel, image=self._folderIcon,
-                                               command=lambda: setFolderPath(self._imageFolderVar))
+                                               command=lambda: setFolderPath(self._imageFolderVar,
+                                                                             "Select image folder"))
 
         outputFolderLabel = tk.Label(selectionPanel, text="Output folder: ")
         outputFolderEntry = tk.Entry(selectionPanel, textvariable=self._aoeGUI.outputFolderPathVar)
         outputFolderSelectionButton = tk.Button(selectionPanel, image=self._folderIcon,
-                                                command=lambda: setFolderPath(self._aoeGUI.outputFolderPathVar))
+                                                command=lambda: setFolderPath(self._aoeGUI.outputFolderPathVar,
+                                                                              "Select output folder"))
 
         maskFolderPanel = tk.LabelFrame(selectionPanel, text="Image masks")
         maskFolderPanel.grid_columnconfigure(1, weight=1)
@@ -67,7 +69,8 @@ class FileSelectionTab:
         maskFolderLabel = tk.Label(maskFolderPanel, text="Mask folder:")
         maskFolderEntry = tk.Entry(maskFolderPanel, textvariable=self._separateMaskFolderPathVar)
         self._maskFolderSelectionButton = tk.Button(maskFolderPanel, state=tk.DISABLED, image=self._folderIcon,
-                                                    command=lambda: setFolderPath(self._separateMaskFolderPathVar))
+                                                    command=lambda: setFolderPath(self._separateMaskFolderPathVar,
+                                                                                  "Select separate mask folder"))
 
         self._overlayPanel = OverlayImageSelectionPanel(self._aoeGUI, selectionPanel)
 
