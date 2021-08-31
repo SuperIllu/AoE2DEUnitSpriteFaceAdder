@@ -14,6 +14,9 @@ class ImageConfiguration:
     offset: tuple[int, int] = (0, 0)
     autoGenerateMask: bool = True
 
+    def serialise(self):
+        return dataclasses.asdict(self)
+
 
 class ImageConfigurationManager:
 
@@ -66,3 +69,6 @@ class ImageConfigurationManager:
         else:
             mergedMask:Image = maskImage
         return (mergedImage, mergedMask)
+
+    def serialiseState(self):
+        return [config.serialise() for config in self._configurationMap.values()]

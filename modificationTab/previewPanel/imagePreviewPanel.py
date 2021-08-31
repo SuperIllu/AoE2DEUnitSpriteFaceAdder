@@ -6,6 +6,7 @@ from functions.imageMerger import mergeImages, createResultImage, generateDeltaM
 from managers.imageConfigManager import ImageConfiguration
 from imageInspector import linkImageInspector
 from functions.tooltips import BindTooltip
+from modificationTab.previewPanel.previewPanelUI import PreviewPanelUI
 
 
 class ImagePreviewPanel:
@@ -26,60 +27,17 @@ class ImagePreviewPanel:
         self._imageConfiguration: ImageConfiguration = None
 
     def _buildUI(self):
-        self._previewPanel = tk.LabelFrame(self._parentFrame, text="Preview")
-        self._previewPanel.grid_columnconfigure(0, weight=1)
-        self._previewPanel.grid_columnconfigure(1, weight=1)
-        self._previewPanel.grid_columnconfigure(2, weight=1)
-
-        baseImageLabel = tk.Label(self._previewPanel, text="Base Image")
-        baseMaskLabel = tk.Label(self._previewPanel, text="Base Mask")
-        baseResultLabel = tk.Label(self._previewPanel, text="Base Result")
-        self._baseImageCanvas = tk.Canvas(self._previewPanel, bg="white",
-                                          width=ImagePreviewPanel.PreviewWidth,
-                                          height=ImagePreviewPanel.PreviewHeight)
-        self._baseMaskCanvas = tk.Canvas(self._previewPanel, bg="white",
-                                         width=ImagePreviewPanel.PreviewWidth,
-                                         height=ImagePreviewPanel.PreviewHeight)
-        self._baseResultCanvas = tk.Canvas(self._previewPanel, bg="white",
-                                           width=ImagePreviewPanel.PreviewWidth,
-                                           height=ImagePreviewPanel.PreviewHeight)
-
-        overlayImageLabel = tk.Label(self._previewPanel, text="Overlaid image")
-        overlayMaskLabel = tk.Label(self._previewPanel, text="Overlaid mask")
-        overlayResultLabel = tk.Label(self._previewPanel, text="Overlaid result")
-        self._overlayImageCanvas = tk.Canvas(self._previewPanel, bg="white",
-                                             width=ImagePreviewPanel.PreviewWidth,
-                                             height=ImagePreviewPanel.PreviewHeight)
-        self._overlayMaskCanvas = tk.Canvas(self._previewPanel, bg="white",
-                                            width=ImagePreviewPanel.PreviewWidth,
-                                            height=ImagePreviewPanel.PreviewHeight)
-        self._overlayResultCanvas = tk.Canvas(self._previewPanel, bg="white",
-                                              width=ImagePreviewPanel.PreviewWidth,
-                                              height=ImagePreviewPanel.PreviewHeight)
         self._autoGenerateOverlayMaskVar = tk.BooleanVar()
         self._autoGenerateOverlayMaskVar.set(True)
-        autoGenerateOverlayMaskCheckbox = tk.Checkbutton(self._previewPanel, text="Auto generate overlay mask",
-                                                         variable=self._autoGenerateOverlayMaskVar,
-                                                         command=self._updateAutoGenerateFlag)
-
-        baseImageLabel.grid(row=0, column=0)
-        baseMaskLabel.grid(row=0, column=1)
-        baseResultLabel.grid(row=0, column=2)
-        self._baseImageCanvas.grid(row=1, column=0)
-        self._baseMaskCanvas.grid(row=1, column=1)
-        self._baseResultCanvas.grid(row=1, column=2)
-
-        overlayImageLabel.grid(row=2, column=0)
-        overlayMaskLabel.grid(row=2, column=1)
-        overlayResultLabel.grid(row=2, column=2)
-        self._overlayImageCanvas.grid(row=3, column=0)
-        self._overlayMaskCanvas.grid(row=3, column=1)
-        self._overlayResultCanvas.grid(row=3, column=2)
-
-        autoGenerateOverlayMaskCheckbox.grid(row=4, column=0, columnspan=3)
+        self._previewPanelFrame = PreviewPanelUI(self, self._parentFrame, self._autoGenerateOverlayMaskVar)
 
     def getFrame(self):
-        return self._previewPanel
+        return self._previewPanelFrame.getFrame()
+
+    def updateAutoGenerateFlag(self, generate: bool):
+        if self._imageConfiguration:
+            self._imageConfiguration.autoGenerateMask = generate
+            self._updateMergedImage()
 
     def _updateAutoGenerateFlag(self):
         if self._imageConfiguration:
@@ -94,19 +52,15 @@ class ImagePreviewPanel:
             self._modificationPanel.ImageConfigManager.getImageAndMask(configuration.imageName)
 
         self._scaledBaseImage, self._scaledBasePhotoimage = \
-            loadImageToCanvas(self._baseImage, self._baseImageCanvas)
+            self._previewPanelFrame.loadBaseImage(self._baseImage)
 
         if self._baseMask:
             self._scaledBaseMaskImage, self._scaledBaseMaskPhotoimage = \
-                loadImageToCanvas(self._baseMask, self._baseMaskCanvas)
-            linkImageInspector(self._baseMaskCanvas, self._baseMask, "Base image")
+                self._previewPanelFrame.loadBaseMask(self._baseMask)
 
             resultImage = createResultImage(self._baseImage, self._baseMask)
             self._scaledBaseResultImage, self._scaledBaseResultPhotoimage = \
-                loadImageToCanvas(resultImage, self._baseResultCanvas)
-            linkImageInspector(self._baseResultCanvas, self._scaledBaseResultImage, "Base mask")
-
-        linkImageInspector(self._baseImageCanvas, self._baseImage, "Base result")
+                self._previewPanelFrame.loadBaseResult(resultImage)
 
         self._updateMergedImage()
 
@@ -117,7 +71,7 @@ class ImagePreviewPanel:
             self._mergedImage = mergeImages(self._baseImage, self._overlayImage, self._overlayOffset)
             # these are only temporary, need references to avoid GC
             self._scaledMergedImage, self._scaledMergedPhotoimage = \
-                loadImageToCanvas(self._mergedImage, self._overlayImageCanvas)
+                self._previewPanelFrame.loadMergedImage(self._mergedImage)
 
             if self._autoGenerateOverlayMaskVar.get():
                 self._mergedMask = generateDeltaMask(self._baseImage, self._mergedImage, self._baseMask)
@@ -126,12 +80,12 @@ class ImagePreviewPanel:
 
             # these are only temporary, need references to avoid GC
             self._scaledMergedMask, self._scaledMergedMaskPhotoimage = \
-                loadImageToCanvas(self._mergedMask, self._overlayMaskCanvas)
+                self._previewPanelFrame.loadMergedMask(self._mergedMask)
 
             resultImage = createResultImage(self._mergedImage, self._mergedMask)
             # these are only temporary, need references to avoid GC
             self._mergedResultImage, self._mergedResultPhotoimage = \
-                loadImageToCanvas(resultImage, self._overlayResultCanvas)
+                self._previewPanelFrame.loadMergedResult(resultImage)
 
     def getMergedImage(self):
         return self._mergedImage

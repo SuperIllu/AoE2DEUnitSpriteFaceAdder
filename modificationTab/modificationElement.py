@@ -1,4 +1,3 @@
-import os
 import tkinter as tk
 from typing import Optional
 
@@ -6,7 +5,7 @@ from managers.imageConfigManager import ImageConfigurationManager, ImageConfigur
 from modificationTab.fileInfoPanel import FileInfoPanel
 from modificationTab.fileListPanel import FileListPanel
 from modificationTab.globalExporting.globalExportPanel import GlobalExportPanel
-from modificationTab.imagePreviewPanel import ImagePreviewPanel
+from modificationTab.previewPanel.imagePreviewPanel import ImagePreviewPanel
 from modificationTab.localExportPanel import LocalExportPanel
 from modificationTab.overlayImageSelection import OverlaySelectionPanel
 from modificationTab.overlayPositionControls import OverlayPositionControls

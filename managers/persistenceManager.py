@@ -53,8 +53,9 @@ class PersistenceManager:
 
     def _assembleConfiguration(self):
         fileState = self._mainGui.getFileSelectionElement().serialiseState()
+        configState = self._mainGui.getOverlayElement().serialiseState()
 
-        return {"files": fileState}
+        return {"files": fileState, "configs": configState}
 
 
 def addPersistanceInterfaceToMenu(gui) -> PersistenceManager:
