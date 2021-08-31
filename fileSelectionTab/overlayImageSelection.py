@@ -2,7 +2,7 @@ import tkinter as tk
 import tkinter.filedialog
 import os
 from PIL import Image, ImageTk
-from Functions import calculatePreviewImageSize, loadImagePathToCanvas
+from functions.Functions import calculatePreviewImageSize, loadImagePathToCanvas
 
 
 class OverlayImageSelectionPanel:

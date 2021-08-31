@@ -1,7 +1,7 @@
 import tkinter as tk
 
 from PIL import Image
-from Functions import loadImageToCanvas, calculatePreviewImageSize, getCanvasSize
+from functions.Functions import loadImageToCanvas, calculatePreviewImageSize, getCanvasSize
 
 
 def linkImageInspector(element, image: Image, imageName: str):

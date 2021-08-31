@@ -1,10 +1,10 @@
 import dataclasses
 from typing import Optional
+from dataclasses import dataclass
 
 from PIL import Image
-from imageMerger import mergeImages, generateDeltaMask
-from imageFileManager import ImageFileManager
-from dataclasses import dataclass
+from functions.imageMerger import mergeImages, generateDeltaMask
+from managers.imageFileManager import ImageFileManager
 
 
 @dataclass(order=True)

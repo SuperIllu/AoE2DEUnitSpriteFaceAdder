@@ -6,8 +6,8 @@ import tkinter.ttk as ttk
 
 from fileSelectionTab.fileSelectionLoadTab import FileSelectionLoadTab
 from fileSelectionTab.overlayImageSelection import OverlayImageSelectionPanel
-from imageFileManager import ImageFileManager
-from tooltips import BindTooltip
+from managers.imageFileManager import ImageFileManager
+from functions.tooltips import BindTooltip
 
 
 def setFolderPath(stringVar: tk.StringVar, title: str="Select folder"):

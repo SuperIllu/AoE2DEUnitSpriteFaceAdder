@@ -1,11 +1,11 @@
 from PIL import Image
 import tkinter as tk
 
-from Functions import loadImageToCanvas
-from imageMerger import mergeImages, createResultImage, generateDeltaMask
-from imageConfigManager import ImageConfiguration
+from functions.Functions import loadImageToCanvas
+from functions.imageMerger import mergeImages, createResultImage, generateDeltaMask
+from managers.imageConfigManager import ImageConfiguration
 from imageInspector import linkImageInspector
-from tooltips import BindTooltip
+from functions.tooltips import BindTooltip
 
 
 class ImagePreviewPanel:

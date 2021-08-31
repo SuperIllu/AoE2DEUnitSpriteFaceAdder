@@ -1,7 +1,7 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 
-from persistenceManager import addPersistanceInterfaceToMenu
+from managers.persistenceManager import addPersistanceInterfaceToMenu
 from fileSelectionTab.fileSelectionTab import FileSelectionTab
 from modificationTab.modificationElement import ModificationElement
 

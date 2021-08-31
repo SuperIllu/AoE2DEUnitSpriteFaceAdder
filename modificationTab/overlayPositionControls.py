@@ -2,7 +2,7 @@ import tkinter as tk
 import threading
 import time
 
-from imageConfigManager import ImageConfiguration
+from managers.imageConfigManager import ImageConfiguration
 
 
 class HoldBindCommand:

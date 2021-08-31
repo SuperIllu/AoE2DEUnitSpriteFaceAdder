@@ -2,8 +2,8 @@ import os
 import tkinter as tk
 import tkinter.messagebox
 
-from imageFileManager import ImageFileManager
-from tooltips import BindTooltip
+from managers.imageFileManager import ImageFileManager
+from functions.tooltips import BindTooltip
 
 
 class FileSelectionLoadTab:

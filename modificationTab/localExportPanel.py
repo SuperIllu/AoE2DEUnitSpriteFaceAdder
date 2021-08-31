@@ -2,7 +2,7 @@ import tkinter as tk
 import os
 from PIL import Image
 
-from imageFileManager import ImageFileManager
+from managers.imageFileManager import ImageFileManager
 
 
 class LocalExportPanel:

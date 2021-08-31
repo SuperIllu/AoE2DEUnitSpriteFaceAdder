@@ -5,8 +5,8 @@ from tkinter import messagebox
 import tkinter.ttk as ttk
 
 from fileSelectionTab.fileSelectionTab import setFolderPath
-from imageConfigManager import ImageConfigurationManager
-from imageFileManager import ImageFileManager
+from managers.imageConfigManager import ImageConfigurationManager
+from managers.imageFileManager import ImageFileManager
 from modificationTab.globalExporting.globalExportConfirmation import GlobalExportConfirmation
 
 

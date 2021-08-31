@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from Functions import trimStringToElementLength, loadImagePathToCanvas
+from functions.Functions import trimStringToElementLength, loadImagePathToCanvas
 
 
 class OverlaySelectionPanel:

@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from Functions import trimStringToElementLength
+from functions.Functions import trimStringToElementLength
 
 
 class FileInfoPanel:

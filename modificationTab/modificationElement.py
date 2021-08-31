@@ -2,7 +2,7 @@ import os
 import tkinter as tk
 from typing import Optional
 
-from imageConfigManager import ImageConfigurationManager, ImageConfiguration
+from managers.imageConfigManager import ImageConfigurationManager, ImageConfiguration
 from modificationTab.fileInfoPanel import FileInfoPanel
 from modificationTab.fileListPanel import FileListPanel
 from modificationTab.globalExporting.globalExportPanel import GlobalExportPanel
@@ -115,7 +115,11 @@ class ModificationElement:
         self._previewPanel.loadImage(self._imageConfiguration)
         self._maskPositionPanel.loadConfiguration(self._imageConfiguration)
 
+    def serialiseState(self):
+        return self._imageConfigManager.serialiseState()
 
+    def deserialise(self, serialisedState):
+        self._imageConfigManager.deserialiseState(serialisedState)
 
 
 
