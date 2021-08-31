@@ -50,6 +50,8 @@ class FileSelectionLoadTab:
     def getFrame(self):
         return self._loadPanelFrame
 
+    def loadAfterLoadFromFile(self):
+        self._loadIntoOverlayTab()
 
     def _loadIntoOverlayTab(self):
         if self._separateMaskFolderVar.get():

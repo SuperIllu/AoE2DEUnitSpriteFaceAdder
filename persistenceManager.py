@@ -11,12 +11,15 @@ class PersistenceManager:
         self._currentConfiguration: str = None
 
     def saveNewConfiguration(self):
+        """ always ask where to store the content """
         selection = tk.filedialog. \
             asksaveasfilename(title="Save CHUM configuration")
         if selection:
+            self._currentConfiguration = selection
             self._saveToFilePath(selection)
 
     def overrideCurrentConfiguration(self):
+        """ only asks where to store, if no previous file is set """
         if not self._currentConfiguration:
             self.saveNewConfiguration()
         else:
@@ -41,8 +44,6 @@ class PersistenceManager:
         except Exception:
             tk.messagebox.showwarning("Loading failed", "Could not load the selected file!")
 
-
-
     def _saveToFilePath(self, filePath):
         state = self._assembleConfiguration()
         if not filePath.lower().endswith(".json"):
@@ -61,8 +62,8 @@ def addPersistanceInterfaceToMenu(gui) -> PersistenceManager:
     menuBar = tk.Menu(gui.getMain())
     fileMenu = tk.Menu(menuBar, tearoff=0)
     fileMenu.add_command(label="Load", command=persistanceManager.loadConfiguration)
-    fileMenu.add_command(label="Save", command=persistanceManager.saveNewConfiguration)
-    fileMenu.add_command(label="Save as", command=persistanceManager.overrideCurrentConfiguration)
+    fileMenu.add_command(label="Save", command=persistanceManager.overrideCurrentConfiguration)
+    fileMenu.add_command(label="Save as", command=persistanceManager.saveNewConfiguration)
     fileMenu.add_separator()
     fileMenu.add_command(label="Exit", command=gui.getMain().destroy)
     menuBar.add_cascade(label="File", menu=fileMenu)

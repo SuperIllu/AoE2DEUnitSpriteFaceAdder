@@ -117,4 +117,5 @@ class FileSelectionTab:
         self._separateMaskFolderPathVar.set(separateMasks[1])
         self._aoeGUI.outputFolderPathVar.set(state.get("outputFolder", None))
         self._overlayPanel.loadOverlayImages(state.get("overlayImages", None))
+        self._loadTab.loadAfterLoadFromFile()
 
