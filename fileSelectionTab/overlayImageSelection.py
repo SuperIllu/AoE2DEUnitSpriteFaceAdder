@@ -22,7 +22,7 @@ class OverlayImageSelectionPanel:
         overLayPanel.grid_columnconfigure(0, weight=0)
         overLayPanel.grid_columnconfigure(1, weight=1)
         overLayPanel.grid_columnconfigure(2, weight=0)
-        addOverlayImages = tk.Button(overLayPanel, text="Add image(s)", command=self._addOverlayPictures)
+        addOverlayImages = tk.Button(overLayPanel, text="Add image(s)", command=self._askForAdditionalOverlayPicture)
         removeOverlayImages = tk.Button(overLayPanel, text="Remove selected", command=self._removeSelectedImage)
         removeAllOverlayImages = tk.Button(overLayPanel, text="Remove all images", command=self._removeAllImages)
         self._overlayImagesList = tk.Listbox(overLayPanel)
@@ -35,7 +35,7 @@ class OverlayImageSelectionPanel:
         self._overlayImagesList.grid(row=0, column=1, rowspan=3, sticky="news", padx=(10, 10), pady=(5, 10))
         self._overlayImagesPreview.grid(row=0, column=2, rowspan=3, padx=(5, 5))
 
-    def _addOverlayPictures(self):
+    def _askForAdditionalOverlayPicture(self):
         selections = tk.filedialog.askopenfilename(
             title="Add overlay images",
             multiple=True, filetypes=[
@@ -43,11 +43,14 @@ class OverlayImageSelectionPanel:
                 ("All", "*")])
         for file in selections:
             if file not in self._overlayImages.values():
-                fileName = os.path.basename(file)
-                displayName = f"{self._fileCounter} - {fileName}"
-                self._fileCounter += 1
-                self._overlayImages[displayName] = file
-                self._overlayImagesList.insert(tk.END, displayName)
+                self._addOverlayPicture(file)
+
+    def _addOverlayPicture(self, file):
+        fileName = os.path.basename(file)
+        displayName = f"{self._fileCounter} - {fileName}"
+        self._fileCounter += 1
+        self._overlayImages[displayName] = file
+        self._overlayImagesList.insert(tk.END, displayName)
 
     def getFrame(self):
         return self._overlayPanel
@@ -86,8 +89,13 @@ class OverlayImageSelectionPanel:
         except Exception as e:
             print(e)
 
-
     def getOverlayImages(self):
         return self._overlayImages
+
+    def loadOverlayImages(self, imageList):
+        if imageList:
+            for imagePath in imageList:
+                self._addOverlayPicture(imagePath)
+
 
 

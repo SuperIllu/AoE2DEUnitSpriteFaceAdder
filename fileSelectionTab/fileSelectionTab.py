@@ -133,13 +133,13 @@ class FileSelectionTab:
             tk.messagebox.showwarning("No image folder", "You need to set an image folder path")
             return
 
-        fileManager = ImageFileManager(self._imageFolderVar.get(), maskFolderPath,
+        self._fileManager = ImageFileManager(self._imageFolderVar.get(), maskFolderPath,
                                        self._overlayPanel.getOverlayImages())
-        consistencyCheck = fileManager.checkFileToMapConsitency()
-        if not self.setStatusMessagesAfterLoad(fileManager, consistencyCheck):
+        consistencyCheck = self._fileManager.checkFileToMapConsitency()
+        if not self.setStatusMessagesAfterLoad(self._fileManager, consistencyCheck):
             return
 
-        self._aoeGUI.getOverlayElement().ImageFileManager = fileManager
+        self._aoeGUI.getOverlayElement().ImageFileManager = self._fileManager
 
         self._aoeGUI.getOverlayElement().loadConfiguration(
             self._imageFolderVar.get(), maskFolderPath,
@@ -184,5 +184,20 @@ class FileSelectionTab:
             self._loadSummaryDetailTextArea.insert(tk.END, f"No images found for masks:\n {missingImages}\n\n")
             print(f"[WARN] Masks missing images: {consistencyCheck[1]}")
 
-
         return True
+
+    def serialiseState(self):
+        return {"imageFolder": self._imageFolderVar.get(),
+                "separateMasks": (self._separateMaskFolderVar.get(), self._separateMaskFolderPathVar.get()),
+                "outputFolder": self._aoeGUI.outputFolderPathVar.get(),
+                "overlayImages": list(self._overlayPanel.getOverlayImages().values())
+                }
+
+    def deserialiseState(self, state: dict):
+        self._imageFolderVar.set(state.get("imageFolder", None))
+        separateMasks = state.get("separateMasks", (False, None))
+        self._separateMaskFolderVar.set(separateMasks[0])
+        self._separateMaskFolderPathVar.set(separateMasks[1])
+        self._aoeGUI.outputFolderPathVar.set(state.get("outputFolder", None))
+        self._overlayPanel.loadOverlayImages(state.get("overlayImages", None))
+

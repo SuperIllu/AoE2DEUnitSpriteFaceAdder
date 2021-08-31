@@ -1,6 +1,7 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 
+from persistenceManager import addPersistanceInterfaceToMenu
 from fileSelectionTab.fileSelectionTab import FileSelectionTab
 from modificationTab.modificationElement import ModificationElement
 
@@ -10,12 +11,13 @@ class AoeUnitGui:
     def __init__(self):
         self._buildUI()
         self._setIcon()
+        self._buildMenu()
         self._startUI()
 
     def _buildUI(self):
         self._main = tk.Tk()
         self._main.title("CHUM (CHonk's Unit Modifier)")
-        self._main.geometry("875x700")
+        self._main.geometry("875x715")
         self._main.grid_columnconfigure(0, weight=1)
         self._main.grid_rowconfigure(0, weight=0)
         self._main.grid_rowconfigure(1, weight=1)
@@ -41,7 +43,8 @@ class AoeUnitGui:
         except Exception:
             pass
 
-
+    def _buildMenu(self):
+        addPersistanceInterfaceToMenu(self)
 
     def getMain(self):
         """ returns tk.Tk(), mainly for keybinds """
