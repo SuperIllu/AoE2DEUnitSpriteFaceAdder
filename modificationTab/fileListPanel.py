@@ -33,7 +33,7 @@ class FileListPanel:
         self._listBox.config(yscrollcommand=self._scrollBar.set)
         self._scrollBar.config(command=self._listBox.yview)
 
-        self._listBox.bind('<<ListboxSelect>>', self._onFileSelected)
+        self._listBox.bind('<<ListboxSelect>>', self._onListEntrySelected)
 
         self._listBox.grid(row=0, column=0, sticky="news")
         self._scrollBar.grid(row=0, column=1, sticky="news")
@@ -61,7 +61,7 @@ class FileListPanel:
             self._listBox.insert(tk.END, file)
             self._listBox.itemconfig(tk.END, bg="white")
 
-    def _onFileSelected(self, event):
+    def _onListEntrySelected(self, event):
         selectionIndex = self._listBox.curselection()
         if len(selectionIndex) != 1:
             return
@@ -69,6 +69,6 @@ class FileListPanel:
         imageSelection = self._listBox.get(selectionIndex[0])
         fullImagePath = self._validFiles.get(imageSelection, None)
 
-        self._modificationPanel.loadImage(imageSelection, fullImagePath)
+        self._modificationPanel.selectImageToModify(imageSelection, fullImagePath)
 
 

@@ -22,12 +22,12 @@ class ImageFileManager:
     def evaluateCheckResult(result):
         return len(result[0]) == len(result[1]) == 0 and result[2]
 
-    def __init__(self, imageFileFolder: str, maskFileFolder: str, overlayImages):
+    def __init__(self, imageFileFolder: str, maskFileFolder: str, overlayManager):
         self._imageFileFolder = imageFileFolder
         self._maskFileFolder = maskFileFolder
         self._imageMap = {}
         self._maskMap = {}
-        self._overlayImages = overlayImages
+        self._overlayManager = overlayManager
 
         self.load()
 
@@ -71,7 +71,7 @@ class ImageFileManager:
             if expectedImageName not in self._imageMap.keys():
                 masksWithMissingImages.append(mask)
 
-        return (imagesWithMissingMasks, masksWithMissingImages, len(self._overlayImages) > 0)
+        return (imagesWithMissingMasks, masksWithMissingImages, len(self._overlayManager.getOverlayImages()) > 0)
 
     def getMaskToImage(self, fullImagePath) -> tuple[str, str]:
         """ returns the file name and full path of the of corresponding mask """

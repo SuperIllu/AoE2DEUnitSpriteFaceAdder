@@ -1,11 +1,8 @@
 from PIL import Image
 import tkinter as tk
 
-from functions.Functions import loadImageToCanvas
 from functions.imageMerger import mergeImages, createResultImage, generateDeltaMask
 from managers.imageConfigManager import ImageConfiguration
-from imageInspector import linkImageInspector
-from functions.tooltips import BindTooltip
 from modificationTab.previewPanel.previewPanelUI import PreviewPanelUI
 
 
@@ -18,13 +15,11 @@ class ImagePreviewPanel:
         self._parentFrame = parentFrame
         self._buildUI()
         self._baseImage: Image = None
-        self._overlayImage: Image = None
+        self._overlayImageIndex: int = -1
         self._overlayOffset = None
-        self._overlayImageName = None
         self._mergedImage = None
         self._mergedMask = None
         self._overlayOffset = (0, 0)
-        self._imageConfiguration: ImageConfiguration = None
 
     def _buildUI(self):
         self._autoGenerateOverlayMaskVar = tk.BooleanVar()
@@ -35,19 +30,17 @@ class ImagePreviewPanel:
         return self._previewPanelFrame.getFrame()
 
     def updateAutoGenerateFlag(self, generate: bool):
-        if self._imageConfiguration:
-            self._imageConfiguration.autoGenerateMask = generate
+        configuration = self._modificationPanel.getCurrentImageConfig()
+        if configuration:
+            configuration.autoGenerateMask = generate
             self._updateMergedImage()
 
-    def _updateAutoGenerateFlag(self):
-        if self._imageConfiguration:
-            self._imageConfiguration.autoGenerateMask = self._autoGenerateOverlayMaskVar.get()
-            self._updateMergedImage()
-
-    def loadImage(self, configuration: ImageConfiguration):
+    def loadImageToPreview(self, configuration: ImageConfiguration):
         """ Called (indirectly) from the list element """
-        self._imageConfiguration = configuration
         self._autoGenerateOverlayMaskVar.set(configuration.autoGenerateMask)
+        overlayImagePath = self._modificationPanel.OverlayImageManager.getImageForIndex(configuration.overlayImageIndex)
+        self._overlayImage = Image.open(overlayImagePath)
+
         self._baseImage, self._baseMask = \
             self._modificationPanel.ImageConfigManager.getImageAndMask(configuration.imageName)
 
@@ -66,17 +59,31 @@ class ImagePreviewPanel:
 
     def _updateMergedImage(self):
         """ creates new images when any overlay information is changed """
-        if self._baseImage and self._overlayImage and self._overlayOffset:
+        if self._baseImage:
+            configuration = self._modificationPanel.getCurrentImageConfig()
+            if configuration is None:
+                print("No configuration -> skip")
+                return
 
-            self._mergedImage = mergeImages(self._baseImage, self._overlayImage, self._overlayOffset)
+            if configuration.hasOverlay:
+                fullOverlayImageFilePath = self._modificationPanel.OverlayImageManager. \
+                    getImageForIndex(configuration.overlayImageIndex)
+                overlayImage = Image.open(fullOverlayImageFilePath)
+
+                self._mergedImage = mergeImages(self._baseImage, overlayImage, configuration)
+
+
+                if self._autoGenerateOverlayMaskVar.get():
+                    self._mergedMask = generateDeltaMask(self._baseImage, self._mergedImage, self._baseMask)
+                else:
+                    self._mergedMask = self._baseMask
+            else:
+                self._mergedImage = self._baseImage
+                self._mergedMask = self._baseMask
+
             # these are only temporary, need references to avoid GC
             self._scaledMergedImage, self._scaledMergedPhotoimage = \
                 self._previewPanelFrame.loadMergedImage(self._mergedImage)
-
-            if self._autoGenerateOverlayMaskVar.get():
-                self._mergedMask = generateDeltaMask(self._baseImage, self._mergedImage, self._baseMask)
-            else:
-                self._mergedMask = self._baseMask
 
             # these are only temporary, need references to avoid GC
             self._scaledMergedMask, self._scaledMergedMaskPhotoimage = \
@@ -93,35 +100,31 @@ class ImagePreviewPanel:
     def getMergedMask(self):
         return self._mergedMask
 
-    def setOverlayImage(self, overlayImageName: str, fullOverlayImageFilePath: Image):
-        if self._overlayImageName != overlayImageName:
-            self._overlayImage = Image.open(fullOverlayImageFilePath)
-            self._updateMergedImage()
-        self._overlayImageName = overlayImageName
-        self._updateImageConfiguration()
+    def updateFromConfiguration(self):
+        self._updateMergedImage()
 
-    def getOverlayOffset(self):
-        return self._overlayOffset
-
-    def _updateImageConfiguration(self):
-        if self._imageConfiguration:
-            self._imageConfiguration.overlayImage = self._overlayImage
-            self._imageConfiguration.offset = self._overlayOffset
+    def getOverlayOffset(self) -> tuple[int, int]:
+        config = self._modificationPanel.getCurrentImageConfig()
+        if config is not None:
+            return self._modificationPanel.getCurrentImageConfig().offset
+        else:
+            return (0, 0)
 
     def setOverlayPosition(self, position: tuple[int, int]) -> tuple[int, int]:
-        if position != self._overlayOffset:
-            self._overlayOffset = position
+        if position != self._modificationPanel.getCurrentImageConfig().offset:
+            self._modificationPanel.getCurrentImageConfig().offset = position
             self._updateMergedImage()
-        self._updateImageConfiguration()
-        return self._overlayOffset
+        return position
 
     def moveOverlay(self, direction) -> tuple[int, int]:
         direction = direction.lower()
         directionMap = {"up": (0, -1), "down": (0, 1), "right": (1, 0), "left": (-1, 0)}
         directionVector = directionMap.get(direction, None)
+        currentPosition = self._modificationPanel.getCurrentImageConfig().offset
         if directionVector:
-            self._overlayOffset = (self._overlayOffset[0] + directionVector[0],
-                                   self._overlayOffset[1] + directionVector[1])
+            newPosition = (currentPosition[0] + directionVector[0],
+                           currentPosition[1] + directionVector[1])
+            self._modificationPanel.getCurrentImageConfig().offset = newPosition
             self._updateMergedImage()
-            return self._overlayOffset
+            return newPosition
         return None

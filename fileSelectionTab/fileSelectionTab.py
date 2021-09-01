@@ -107,7 +107,7 @@ class FileSelectionTab:
         return {"imageFolder": self._imageFolderVar.get(),
                 "separateMasks": (self._separateMaskFolderVar.get(), self._separateMaskFolderPathVar.get()),
                 "outputFolder": self._aoeGUI.outputFolderPathVar.get(),
-                "overlayImages": list(self._overlayPanel.getOverlayImages().values())
+                "overlayImages": self._overlayPanel.getOverlayImageManager().serialiseState()
                 }
 
     def deserialiseState(self, state: dict):

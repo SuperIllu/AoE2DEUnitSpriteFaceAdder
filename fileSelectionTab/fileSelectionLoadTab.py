@@ -63,17 +63,16 @@ class FileSelectionLoadTab:
             tk.messagebox.showwarning("No image folder", "You need to set an image folder path")
             return
 
-        self._fileManager = ImageFileManager(self._imageFolderVar.get(), maskFolderPath,
-                                       self._overlayPanel.getOverlayImages())
-        consistencyCheck = self._fileManager.checkFileToMapConsitency()
-        if not self.setStatusMessagesAfterLoad(self._fileManager, consistencyCheck):
+        overlayImageManager = self._overlayPanel.getOverlayImageManager()
+        fileManager = ImageFileManager(self._imageFolderVar.get(), maskFolderPath,
+                                       overlayImageManager)
+        consistencyCheck = fileManager.checkFileToMapConsitency()
+        if not self.setStatusMessagesAfterLoad(fileManager, consistencyCheck):
             return
 
-        self._aoeGUI.getOverlayElement().ImageFileManager = self._fileManager
-
         self._aoeGUI.getOverlayElement().loadConfiguration(
-            self._imageFolderVar.get(), maskFolderPath,
-            self._overlayPanel.getOverlayImages()
+            fileManager, overlayImageManager,
+            self._imageFolderVar.get(), maskFolderPath
         )
 
     def setStatusMessagesAfterLoad(self, fileManager, consistencyCheck) -> bool:
@@ -85,7 +84,8 @@ class FileSelectionLoadTab:
         self._imagesLoadedVar.set(imagesLoadedMsg)
         masksLoadedMsg = f"Masks loaded: \t\t{len(fileManager.getAllMaskNames())}"
         self._masksLoadedVar.set(masksLoadedMsg)
-        overlaysLoadedMsg = f"Overlay images load: \t{len(self._overlayPanel.getOverlayImages().keys())}"
+        overlaysLoadedMsg = f"Overlay images load: " \
+                            f"\t{len(self._overlayPanel.getOverlayImageManager().getOverlayImages())}"
         self._overlayImagesVar.set(overlaysLoadedMsg)
 
         if noIssues:

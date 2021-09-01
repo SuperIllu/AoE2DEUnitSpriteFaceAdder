@@ -5,12 +5,14 @@ from dataclasses import dataclass
 from PIL import Image
 from functions.imageMerger import mergeImages, generateDeltaMask
 from managers.imageFileManager import ImageFileManager
+from managers.overlayImageManager import OverlayImageManager
 
 
 @dataclass(order=True)
 class ImageConfiguration:
     imageName: Image
-    overlayImage: Image = None
+    hasOverlay: bool = True
+    overlayImageIndex: int = 0
     offset: tuple[int, int] = (0, 0)
     autoGenerateMask: bool = True
 
@@ -20,9 +22,10 @@ class ImageConfiguration:
 
 class ImageConfigurationManager:
 
-    def __init__(self, fileManager: ImageFileManager):
+    def __init__(self, fileManager: ImageFileManager, overlayImageManager: OverlayImageManager):
         self._configurationMap = {}
         self._fileManager = fileManager
+        self._overlayManager = overlayImageManager
 
     def getAllConfiguredImages(self) -> list[str]:
         return list(self._configurationMap.keys())
@@ -56,7 +59,8 @@ class ImageConfigurationManager:
             return (imageImage, maskImage)
 
         configuration = self.getConfiguration(imageName)
-        overlayImage = configuration.overlayImage
+        overlayImagePath = self._overlayManager.getImageForIndex(configuration.overlayImageIndex)
+        overlayImage = Image.open(overlayImagePath)
         overlayImageOffset = configuration.offset
 
         if not (overlayImage and overlayImageOffset):

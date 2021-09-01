@@ -3,6 +3,7 @@ import tkinter.filedialog
 import os
 from PIL import Image, ImageTk
 from functions.Functions import calculatePreviewImageSize, loadImagePathToCanvas
+from managers.overlayImageManager import OverlayImageManager
 
 
 class OverlayImageSelectionPanel:
@@ -11,8 +12,8 @@ class OverlayImageSelectionPanel:
     def __init__(self, aoeGUI, parentFrame):
         self._aoeGUI = aoeGUI
         self._parentFrame = parentFrame
-        self._overlayImages = {}
-        self._fileCounter = 1
+        self._overlayImageManager = OverlayImageManager()
+        self._overlayImagesMap = {}
 
         self._buildUI()
 
@@ -42,14 +43,17 @@ class OverlayImageSelectionPanel:
                 ("image", "*.bmp"), ("image", "*.jpg"), ("image", "*.png"),
                 ("All", "*")])
         for file in selections:
-            if file not in self._overlayImages.values():
+            if file not in self._overlayImagesMap.values():
                 self._addOverlayPicture(file)
 
-    def _addOverlayPicture(self, file):
-        fileName = os.path.basename(file)
-        displayName = f"{self._fileCounter} - {fileName}"
-        self._fileCounter += 1
-        self._overlayImages[displayName] = file
+    def _addOverlayPicture(self, fullImagePath):
+        displayMapItem = self._overlayImageManager.addImage(fullImagePath)
+        if not displayMapItem:
+            return
+        else:
+            displayName, imageIndex = displayMapItem
+        self._overlayImagesMap[displayName] = imageIndex
+
         self._overlayImagesList.insert(tk.END, displayName)
 
     def getFrame(self):
@@ -61,7 +65,7 @@ class OverlayImageSelectionPanel:
             return
         selectedIndex = curSelection[0]
         displayName = self._overlayImagesList.get(selectedIndex)
-        selectedFile = self._overlayImages[displayName]
+        selectedFile = self._overlayImageManager.getImageForDisplayName(displayName)
         print(f"{displayName} -> {selectedFile}")
         self._previewImage(selectedFile)
 
@@ -71,14 +75,14 @@ class OverlayImageSelectionPanel:
             return
         selectedIndex = curSelection[0]
         displayName = self._overlayImagesList.get(selectedIndex)
-        selectedFile = self._overlayImages[displayName]
+        selectedFile = self._overlayImagesMap[displayName]
         print(f"Removing {displayName} -> {selectedFile}")
         self._overlayImagesList.delete(selectedIndex)
-        del self._overlayImages[displayName]
+        del self._overlayImagesMap[displayName]
 
     def _removeAllImages(self):
         self._fileCounter = 1
-        self._overlayImages.clear()
+        self._overlayImagesMap.clear()
         self._overlayImagesList.delete("0", tk.END)
 
     def _previewImage(self, filePath):
@@ -89,8 +93,8 @@ class OverlayImageSelectionPanel:
         except Exception as e:
             print(e)
 
-    def getOverlayImages(self):
-        return self._overlayImages
+    def getOverlayImageManager(self):
+        return self._overlayImageManager
 
     def loadOverlayImages(self, imageList):
         if imageList:

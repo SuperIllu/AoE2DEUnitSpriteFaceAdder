@@ -2,16 +2,19 @@ import PIL
 from PIL import Image
 
 
+
 def mergeImagesViaConfig(baseImage: Image, config) -> PIL.Image:
-    return mergeImages(baseImage, config.overlayImage, config.offset)
+    return mergeImages(baseImage, config.overlayImageIndex, config.offset)
 
 
-def mergeImages(baseImage: Image, overlay: Image, offset: tuple[int, int]) -> PIL.Image:
+def mergeImages(baseImage: Image, overlay: Image, configuration) -> PIL.Image:
     """ doesn't modify the input images, returns a new merged (unscaled) image """
     overlayPixels = overlay.load()
 
     mergedPicture = baseImage.copy()
     mergedPixels = mergedPicture.load()
+
+    offset = configuration.offset
 
     for xPixel in range(0, overlay.size[0]):
         for yPixel in range(0, overlay.size[1]):

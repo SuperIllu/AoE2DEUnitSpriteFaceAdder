@@ -2,12 +2,13 @@ import tkinter as tk
 from typing import Optional
 
 from managers.imageConfigManager import ImageConfigurationManager, ImageConfiguration
+from managers.overlayImageManager import OverlayImageManager
 from modificationTab.fileInfoPanel import FileInfoPanel
 from modificationTab.fileListPanel import FileListPanel
 from modificationTab.globalExporting.globalExportPanel import GlobalExportPanel
 from modificationTab.previewPanel.imagePreviewPanel import ImagePreviewPanel
 from modificationTab.localExportPanel import LocalExportPanel
-from modificationTab.overlayImageSelection import OverlaySelectionPanel
+from modificationTab.modificationOverlayImageSelection import ModificationOverlaySelectionPanel
 from modificationTab.overlayPositionControls import OverlayPositionControls
 
 
@@ -18,7 +19,8 @@ class ModificationElement:
         self._parentFrame = parentFrame
         self._imageFileManager = None
         self._imageConfigManager: Optional[ImageConfigurationManager] = None
-        self._imageConfiguration: Optional[ImageConfiguration] = None
+        self._imageConfiguration: Optional[ImageConfiguration] = ImageConfiguration(None)
+        self._overlayImageManager: Optional[OverlayImageManager] = None
         self._buildUI()
 
         self._selectedFile = None
@@ -31,14 +33,13 @@ class ModificationElement:
     def ImageFileManager(self):
         return self._imageFileManager
 
-    @ImageFileManager.setter
-    def ImageFileManager(self, ifm):
-        self._imageFileManager = ifm
-        self._imageConfigManager = ImageConfigurationManager(ifm)
-
     @property
     def ImageConfigManager(self):
         return self._imageConfigManager
+
+    @property
+    def OverlayImageManager(self):
+        return self._overlayImageManager
 
     def _buildUI(self):
         self._imageList = FileListPanel(self, self._aoeGUI, self._parentFrame)
@@ -81,7 +82,7 @@ class ModificationElement:
         self._fileInfoPanel.getFrame().grid(row=0, column=0, sticky="news")
 
     def _buildOverlayPanel(self):
-        self._overlayImageSelectionPanel = OverlaySelectionPanel(self._overlayPanel, self._previewPanel)
+        self._overlayImageSelectionPanel = ModificationOverlaySelectionPanel(self, self._overlayPanel, self._previewPanel)
         self._overlayImageSelectionPanel.getFrame().grid(row=1, column=0, sticky="news")
 
     def _buildPreviewPanel(self):
@@ -91,11 +92,16 @@ class ModificationElement:
     def getSelectedOverlayImage(self) -> tuple[str, str]:
         return self._overlayImageSelectionPanel.getSelectedOverlayImage()
 
-    def loadConfiguration(self, imageFolderPath: str, maskFolderPath: str, overlayImages:dict):
+    def loadConfiguration(self, imageFileManager, overlayImageManager, imageFolderPath: str, maskFolderPath: str):
+        """ load the image folders, not when an image in the list is selected """
+        self._imageFileManager = imageFileManager
+        self._overlayImageManager = overlayImageManager
+        self._imageConfigManager = ImageConfigurationManager(self._imageFileManager, overlayImageManager)
+
         self._imageFolderPath = imageFolderPath
         self._maskFolderPath = maskFolderPath
 
-        self._overlayImageSelectionPanel.loadAvailableOverlayImages(overlayImages)
+        self._overlayImageSelectionPanel.loadAvailableOverlayImages(overlayImageManager)
         self._imageList.loadImageList(imageFolderPath)
 
     def getOutputFolderPath(self):
@@ -104,15 +110,20 @@ class ModificationElement:
     def getSelectedFile(self):
         return self._selectedFile
 
-    def loadImage(self, fileName, fullImagePath):
+    def selectImageToModify(self, fileName, fullImagePath):
         """ called from the list when selecting an image """
         self._selectedFile = (fileName, fullImagePath)
         self._imageConfiguration = self._imageConfigManager.getConfiguration(self._selectedFile[0],
                                                                              self._imageConfiguration)
+        print(f"{fileName} > {self._imageConfiguration}")
         _, fullMaskPath = self._imageFileManager.getMaskToImage(fileName)
         self._fileInfoPanel.loadFilePaths(fullImagePath, fullMaskPath)
-        self._previewPanel.loadImage(self._imageConfiguration)
+        self._previewPanel.loadImageToPreview(self._imageConfiguration)
+        self._overlayImageSelectionPanel.loadConfiguration(self._imageConfiguration)
         self._maskPositionPanel.loadConfiguration(self._imageConfiguration)
+
+    def getCurrentImageConfig(self):
+        return self._imageConfiguration
 
     def serialiseState(self):
         return self._imageConfigManager.serialiseState()
