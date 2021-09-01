@@ -66,3 +66,8 @@ class OverlayImageManager:
 
     def serialiseState(self):
         return {index: filePath for index, filePath in enumerate(self._overlayImages)}
+
+    def reset(self):
+        self._overlayImages.clear()
+        self._overlayDisplayNamesMap.clear()
+        self._indexToDisplayNameMap.clear()

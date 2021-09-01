@@ -76,3 +76,14 @@ class ImageConfigurationManager:
 
     def serialiseState(self):
         return [config.serialise() for config in self._configurationMap.values()]
+
+    def deserialiseState(self, state: list[dict]):
+        self._configurationMap.clear()
+        if state:
+            for configEntry in state:
+                self._deserialiseEntry(configEntry)
+
+    def _deserialiseEntry(self, entry: dict):
+        self._configurationMap[entry['imageName']] = ImageConfiguration(**entry)
+
+

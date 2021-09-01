@@ -10,6 +10,7 @@ class FileListPanel:
         self._aoeGUI = aoeGUI
         self._parentFrame = parentFrame
         self._validFiles = {}
+        self._imageNamePositions = {}
         self._buildUI()
 
     def _buildUI(self):
@@ -57,7 +58,10 @@ class FileListPanel:
 
         self._imageNumberVar.set(f"Loaded images: {len(self._validFiles.keys())}")
 
+        index: int = 0
         for file in sorted(self._validFiles.keys()):
+            self._imageNamePositions[file] = index
+            index += 1
             self._listBox.insert(tk.END, file)
             self._listBox.itemconfig(tk.END, bg="white")
 
@@ -65,10 +69,19 @@ class FileListPanel:
         selectionIndex = self._listBox.curselection()
         if len(selectionIndex) != 1:
             return
-        self._listBox.itemconfig(selectionIndex[0], bg="DarkSeaGreen1")
+        self.markEntry(selectionIndex[0])
         imageSelection = self._listBox.get(selectionIndex[0])
         fullImagePath = self._validFiles.get(imageSelection, None)
 
         self._modificationPanel.selectImageToModify(imageSelection, fullImagePath)
+
+    def markEntry(self, entryIndex, mark: bool=True):
+        colour = "DarkSeaGreen1" if mark else "white"
+        self._listBox.itemconfig(entryIndex, bg=colour)
+
+    def loadMarkedEntries(self, imagesWithConfigs: list[dict]):
+        imagesNamesWithConfigs = [config['imageName'] for config in imagesWithConfigs]
+        for imageWithConfig in imagesNamesWithConfigs:
+            self.markEntry(self._imageNamePositions[imageWithConfig])
 
 

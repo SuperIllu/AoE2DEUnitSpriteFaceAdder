@@ -96,10 +96,12 @@ class OverlayImageSelectionPanel:
     def getOverlayImageManager(self):
         return self._overlayImageManager
 
-    def loadOverlayImages(self, imageList):
-        if imageList:
-            for imagePath in imageList:
-                self._addOverlayPicture(imagePath)
+    def loadOverlayImages(self, overlayImageDict):
+        self._overlayImagesList.delete("0", tk.END)
+        self._overlayImageManager.reset()
+        if overlayImageDict:
+            for index in overlayImageDict.keys():
+                self._addOverlayPicture(overlayImageDict[index])
 
 
 

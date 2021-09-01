@@ -40,9 +40,12 @@ class PersistenceManager:
             with open(filePath, "r") as file:
                 state = json.load(file)
                 fileSelectionState = state.get("files", None)
+                configurationState = state.get("configs", None)
                 self._mainGui.getFileSelectionElement().deserialiseState(fileSelectionState)
-        except Exception:
+                self._mainGui.getOverlayElement().deserialiseState(configurationState)
+        except Exception as e:
             tk.messagebox.showwarning("Loading failed", "Could not load the selected file!")
+            print(e)
 
     def _saveToFilePath(self, filePath):
         state = self._assembleConfiguration()

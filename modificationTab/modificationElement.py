@@ -128,8 +128,9 @@ class ModificationElement:
     def serialiseState(self):
         return self._imageConfigManager.serialiseState()
 
-    def deserialise(self, serialisedState):
+    def deserialiseState(self, serialisedState):
         self._imageConfigManager.deserialiseState(serialisedState)
+        self._imageList.loadMarkedEntries(serialisedState)
 
 
 
