@@ -1,9 +1,11 @@
 import tkinter as tk
 import tkinter.filedialog
 import tkinter.ttk as ttk
+import webbrowser
 
 from fileSelectionTab.fileSelectionLoadTab import FileSelectionLoadTab
 from fileSelectionTab.overlayImageSelection import OverlayImageSelectionPanel
+from functions.tooltips import BindTooltip
 
 
 def setFolderPath(stringVar: tk.StringVar, title: str="Select folder"):
@@ -22,8 +24,8 @@ class FileSelectionTab:
     def _buildUI(self):
         self._parentFrame.grid_columnconfigure(0, weight=1)
         self._parentFrame.grid_columnconfigure(1, weight=1)
-        self._parentFrame.grid_rowconfigure(0, weight=2)
-        self._parentFrame.grid_rowconfigure(1, weight=2)
+        self._parentFrame.grid_rowconfigure(0, weight=0)
+        self._parentFrame.grid_rowconfigure(1, weight=1)
 
         self._folderIcon = tk.PhotoImage(file="./imgs/folder-icon_22.png")
 
@@ -32,8 +34,34 @@ class FileSelectionTab:
         self._buildButtonPanel()
 
     def _buildIntroPanel(self):
+        url = "https://github.com/SuperIllu/AoE2DEUnitSpriteFaceAdder"
+
+        def _openGithub():
+            webbrowser.open_new(url)
+
         self._introFrame = tk.LabelFrame(self._parentFrame)
-        self._introFrame.grid(row=0, column=0, columnspan=2, sticky="news", padx=(5, 5), pady=(5, 5))
+        self._introFrame.grid_columnconfigure(0, weight=1)
+        self._introFrame.grid_rowconfigure(0, weight=1)
+        self._introFrame.grid_rowconfigure(1, weight=1)
+        self._introFrame.grid_rowconfigure(2, weight=1)
+        self._introFrame.grid_rowconfigure(3, weight=1)
+
+        self._introFrame.grid(row=0, column=0, columnspan=2, sticky="news", padx=(5, 5), pady=(5, 10))
+
+        label1 = tk.Label(self._introFrame,
+                          text="CHUM is a tool intended to help you overlay your face over units in AoE2:DE.")
+        label2 = tk.Label(self._introFrame,
+                          text="You can find the code and latest releases here:")
+        label3 = tk.Label(self._introFrame,
+                          text="github", fg="blue", cursor="hand2")
+        label3.bind("<Button-1>", lambda e: _openGithub())
+        BindTooltip(label3, url, wrapLength=350)
+        label4 = tk.Label(self._introFrame, text="Happy modifying")
+
+        label1.grid(row=0, column=0, sticky="news", pady=(2, 0))
+        label2.grid(row=1, column=0, sticky="news")
+        label3.grid(row=2, column=0, sticky="news")
+        label4.grid(row=3, column=0, sticky="news", pady=(0, 2))
 
     def _buildSelectionPanel(self):
         self._selectionPanel = tk.LabelFrame(self._parentFrame, text="Folder Selection")
