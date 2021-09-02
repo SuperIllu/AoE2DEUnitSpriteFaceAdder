@@ -37,14 +37,18 @@ def mergeImages(baseImage: Image, overlay: Image, configuration) -> PIL.Image:
 
 def createResultImage(image: Image, mask: Image):
     """ Does not modify the input images, creates a new copy which is returned """
-    outputImage = Image.new("RGB", image.size, (200, 200, 200))
+    outputImage = Image.new("RGB", image.size, (225, 225, 225))
 
     if image.size != mask.size:
         print("[ERROR] invalid mask size!")
         return outputImage
 
     filterColours = [(255, 0, 255, 255), (255, 0, 0, 255),  # with alpha channel
-                     (255, 0, 255), (255, 0, 0)]  # without alpha channel
+                     (255, 0, 255)]  # without alpha channel
+
+    shadowColours = [(255, 0, 0)]
+
+    shadowColour = (150, 150, 150)
 
     imagePixels = image.load()
     maskPixels = mask.load()
@@ -54,7 +58,15 @@ def createResultImage(image: Image, mask: Image):
         for yPixel in range(0, image.size[1]):
             maskPixel = maskPixels[xPixel, yPixel]
             if maskPixel not in filterColours:
-                outputPixels[xPixel, yPixel] = imagePixels[xPixel, yPixel]
+                if maskPixel in shadowColours:
+                    imagePixel = imagePixels[xPixel, yPixel]
+                    targetPixel = (imagePixel[0]-30,
+                                   imagePixel[0]-30,
+                                   imagePixel[2]-30)
+                    print(imagePixel)
+                    outputPixels[xPixel, yPixel] = targetPixel
+                else:
+                    outputPixels[xPixel, yPixel] = imagePixels[xPixel, yPixel]
             else:
                 pass
     return outputImage
