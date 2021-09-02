@@ -19,14 +19,14 @@ def calculatePreviewImageSize(canvasSize, previewImage) -> tuple[int, int]:
     return int(picWidth * scaleFactor), int(picHeight * scaleFactor)
 
 
-def loadImageToCanvas(imagePreview: Image, canvas: tkinter.Canvas):
+def loadImageToCanvas(imagePreview: Image, canvas: tkinter.Canvas, resample=None):
     """ does not resize the original image, returns the resized one """
     if imagePreview:
         try:
             canvasSize = getCanvasSize(canvas)
             targetImageSize = calculatePreviewImageSize(canvasSize, imagePreview)
             imagePreview = imagePreview.copy()
-            imagePreview = imagePreview.resize(targetImageSize)  # , PIL.Image.NEAREST = exact pixel scaling
+            imagePreview = imagePreview.resize(targetImageSize, resample=resample)  # , PIL.Image.NEAREST = exact pixel scaling
             photoImagePreview = ImageTk.PhotoImage(imagePreview)
             padding = calculatePadding(canvasSize, targetImageSize)
             canvas.create_image(padding[0], padding[1], anchor="nw", image=photoImagePreview)

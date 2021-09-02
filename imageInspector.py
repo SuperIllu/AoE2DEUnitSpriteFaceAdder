@@ -1,5 +1,6 @@
 import tkinter as tk
 
+import PIL
 from PIL import Image
 from functions.Functions import loadImageToCanvas, calculatePreviewImageSize, getCanvasSize
 
@@ -24,7 +25,8 @@ class ImageInspector:
         self._canvas = tk.Canvas(self._main, width=600, height=600)
         targetSize = calculatePreviewImageSize(getCanvasSize(self._canvas), image)
         self._canvas.config(width=targetSize[0], height=targetSize[1])
-        self._resizedImage, self._resizedPhotomage = loadImageToCanvas(self._image, self._canvas)
+        self._resizedImage, self._resizedPhotomage = loadImageToCanvas(self._image, self._canvas,
+                                                                       resample=PIL.Image.NEAREST)
         self._scaledPixels = self._resizedImage.load()
 
         self._canvas.bind("<Motion>", self._evaluateMousePosition)
