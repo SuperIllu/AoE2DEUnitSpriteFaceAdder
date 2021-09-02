@@ -122,6 +122,9 @@ class ModificationElement:
         self._overlayImageSelectionPanel.loadConfiguration(self._imageConfiguration)
         self._maskPositionPanel.loadConfiguration(self._imageConfiguration)
 
+    def resetConfiguration(self, fileName):
+        self._imageConfigManager.deleteConfiguration(fileName)
+
     def getCurrentImageConfig(self):
         return self._imageConfiguration
 

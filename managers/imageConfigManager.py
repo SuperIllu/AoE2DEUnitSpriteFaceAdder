@@ -33,6 +33,10 @@ class ImageConfigurationManager:
     def hasConfiguration(self, imageName: str) -> bool:
         return imageName in self._configurationMap.keys()
 
+    def deleteConfiguration(self, imageName):
+        if self.hasConfiguration(imageName):
+            del self._configurationMap[imageName]
+
     def getConfiguration(self, imageName:str, configBlueprint: Optional[ImageConfiguration]=None) -> ImageConfiguration:
         if imageName not in self._configurationMap.keys():
             if configBlueprint:

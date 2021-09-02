@@ -35,6 +35,7 @@ class FileListPanel:
         self._scrollBar.config(command=self._listBox.yview)
 
         self._listBox.bind('<<ListboxSelect>>', self._onListEntrySelected)
+        self._listBox.bind('<Button-3>', self._openRightClickMenu)
 
         self._listBox.grid(row=0, column=0, sticky="news")
         self._scrollBar.grid(row=0, column=1, sticky="news")
@@ -69,19 +70,40 @@ class FileListPanel:
         selectionIndex = self._listBox.curselection()
         if len(selectionIndex) != 1:
             return
-        self.markEntry(selectionIndex[0])
+        self._markEntry(selectionIndex[0])
         imageSelection = self._listBox.get(selectionIndex[0])
         fullImagePath = self._validFiles.get(imageSelection, None)
 
         self._modificationPanel.selectImageToModify(imageSelection, fullImagePath)
 
-    def markEntry(self, entryIndex, mark: bool=True):
+    def _openRightClickMenu(self, event):
+        entryIndex = self._listBox.nearest(event.y)
+        imageName = self._listBox.get(entryIndex)
+        if imageName:
+            rightClickMenu = tk.Menu(self._mainPanel, tearoff=0)
+
+            rightClickMenu.add_command(label=imageName)
+            rightClickMenu.add_separator()
+            rightClickMenu.add_command(label="Reset configuration",
+                                       command=lambda: self._resetConfiguration(imageName, entryIndex))
+            try:
+                rightClickMenu.tk_popup(event.x_root, event.y_root)
+            finally:
+                rightClickMenu.grab_release()
+
+    def _resetConfiguration(self, imageName: str, entryIndex: int):
+        self._modificationPanel.resetConfiguration(imageName)
+        self._markEntry(entryIndex, mark=False)
+
+    def _markEntry(self, entryIndex, mark: bool=True):
+        """ colours the given entry """
         colour = "DarkSeaGreen1" if mark else "white"
         self._listBox.itemconfig(entryIndex, bg=colour)
 
     def loadMarkedEntries(self, imagesWithConfigs: list[dict]):
+        """ colour deserialised entries """
         imagesNamesWithConfigs = [config['imageName'] for config in imagesWithConfigs]
         for imageWithConfig in imagesNamesWithConfigs:
-            self.markEntry(self._imageNamePositions[imageWithConfig])
+            self._markEntry(self._imageNamePositions[imageWithConfig])
 
 
