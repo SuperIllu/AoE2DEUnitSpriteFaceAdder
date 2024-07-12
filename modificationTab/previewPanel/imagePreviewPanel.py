@@ -70,8 +70,7 @@ class ImagePreviewPanel:
                     getImageForIndex(configuration.overlayImageIndex)
                 overlayImage = Image.open(fullOverlayImageFilePath)
 
-                self._mergedImage = mergeImages(self._baseImage, overlayImage, configuration)
-
+                self._mergedImage = mergeImages(self._baseImage, overlayImage, configuration.offset)
 
                 if self._autoGenerateOverlayMaskVar.get():
                     self._mergedMask = generateDeltaMask(self._baseImage, self._mergedImage, self._baseMask)

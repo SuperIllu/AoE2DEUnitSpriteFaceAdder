@@ -1,6 +1,4 @@
 import tkinter
-
-import PIL
 from PIL import Image, ImageTk
 
 
@@ -41,7 +39,6 @@ def loadImageToCanvas(imagePreview: Image, canvas: tkinter.Canvas, resample=None
 def loadImagePathToCanvas(fullImagePath: str, canvas: tkinter.Canvas):
     if fullImagePath:
         try:
-            print(f"Preview image: {fullImagePath}")
             imagePreview = Image.open(fullImagePath)
             return loadImageToCanvas(imagePreview, canvas)
         except Exception as e:
@@ -50,6 +47,7 @@ def loadImagePathToCanvas(fullImagePath: str, canvas: tkinter.Canvas):
         canvas.config(bg="grey")
     return (None, None)
 
+
 def calculatePadding(canvasSize, targetImageSize) -> tuple[int, int]:
     """ creates padding to center an Image in a canvas """
     xSlack = canvasSize[0] - targetImageSize[0]
@@ -57,6 +55,7 @@ def calculatePadding(canvasSize, targetImageSize) -> tuple[int, int]:
     xPadding = int(xSlack/2)
     yPadding = int(ySlack/2)
     return (xPadding, yPadding)
+
 
 def trimStringToElementLength(text: str, maxLength: int = 80) -> str:
     if not text:

@@ -1,20 +1,19 @@
+from typing import Tuple
+
 import PIL
 from PIL import Image
-
 
 
 def mergeImagesViaConfig(baseImage: Image, config) -> PIL.Image:
     return mergeImages(baseImage, config.overlayImageIndex, config.offset)
 
 
-def mergeImages(baseImage: Image, overlay: Image, configuration) -> PIL.Image:
+def mergeImages(baseImage: Image, overlay: Image, offset: Tuple) -> PIL.Image:
     """ doesn't modify the input images, returns a new merged (unscaled) image """
     overlayPixels = overlay.load()
 
     mergedPicture = baseImage.copy()
     mergedPixels = mergedPicture.load()
-
-    offset = configuration.offset
 
     for xPixel in range(0, overlay.size[0]):
         for yPixel in range(0, overlay.size[1]):
@@ -48,8 +47,6 @@ def createResultImage(image: Image, mask: Image):
 
     shadowColours = [(255, 0, 0)]
 
-    shadowColour = (150, 150, 150)
-
     imagePixels = image.load()
     maskPixels = mask.load()
     outputPixels = outputImage.load()
@@ -63,7 +60,6 @@ def createResultImage(image: Image, mask: Image):
                     targetPixel = (imagePixel[0]-30,
                                    imagePixel[0]-30,
                                    imagePixel[2]-30)
-                    print(imagePixel)
                     outputPixels[xPixel, yPixel] = targetPixel
                 else:
                     outputPixels[xPixel, yPixel] = imagePixels[xPixel, yPixel]

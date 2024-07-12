@@ -87,7 +87,6 @@ class OverlayImageSelectionPanel:
 
     def _previewImage(self, filePath):
         try:
-            print(f"Preview image: {filePath}")
             self._selectedPreviewImage, self._selectedPreviewPhotoImage = \
                 loadImagePathToCanvas(filePath, self._overlayImagesPreview)
         except Exception as e:
@@ -102,6 +101,3 @@ class OverlayImageSelectionPanel:
         if overlayImageDict:
             for index in overlayImageDict.keys():
                 self._addOverlayPicture(overlayImageDict[index])
-
-
-

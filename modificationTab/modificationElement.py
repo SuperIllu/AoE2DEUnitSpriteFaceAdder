@@ -115,7 +115,6 @@ class ModificationElement:
         self._selectedFile = (fileName, fullImagePath)
         self._imageConfiguration = self._imageConfigManager.getConfiguration(self._selectedFile[0],
                                                                              self._imageConfiguration)
-        print(f"{fileName} > {self._imageConfiguration}")
         _, fullMaskPath = self._imageFileManager.getMaskToImage(fileName)
         self._fileInfoPanel.loadFilePaths(fullImagePath, fullMaskPath)
         self._previewPanel.loadImageToPreview(self._imageConfiguration)
@@ -134,7 +133,3 @@ class ModificationElement:
     def deserialiseState(self, serialisedState):
         self._imageConfigManager.deserialiseState(serialisedState)
         self._imageList.loadMarkedEntries(serialisedState)
-
-
-
-
