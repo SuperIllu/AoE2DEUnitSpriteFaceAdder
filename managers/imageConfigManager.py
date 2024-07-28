@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from PIL import Image
 
-from functions.faceMaskUtils import FaceMaskConfig
+from functions.faceMaskUtils import FaceMaskConfig, apply_face_mask_mods
 from functions.imageMerger import mergeImages, generateDeltaMask
 from managers.imageFileManager import ImageFileManager
 from managers.overlayImageManager import OverlayImageManager
@@ -74,6 +74,8 @@ class ImageConfigurationManager:
         if not (overlayImage and overlayImageOffset):
             # return unmodified images
             return (imageImage, maskImage)
+
+        overlayImage = apply_face_mask_mods(overlayImage, configuration)
 
         mergedImage: Image = mergeImages(imageImage, overlayImage, overlayImageOffset)
         if configuration.autoGenerateMask:
