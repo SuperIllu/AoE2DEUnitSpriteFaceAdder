@@ -54,6 +54,7 @@ class ModificationOverlaySelectionPanel:
     def loadConfiguration(self, configuration: ImageConfiguration):
         """ called when an image is selected from the list"""
         self._displayImageNameByIndex(configuration.overlayImageIndex)
+        self._useOverlayVar.set(configuration.hasOverlay)
 
     def loadAvailableOverlayImages(self, overlayImageManager):
         self._overlayImageManager = overlayImageManager
