@@ -5,6 +5,10 @@ from functools import wraps
 
 from PIL import Image, ImageTk
 
+"""
+a bunch of common and helper functions used across multiple elements 
+"""
+
 
 def timeit(func):
     @wraps(func)

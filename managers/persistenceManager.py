@@ -5,6 +5,7 @@ import json
 
 
 class PersistenceManager:
+    """Handles saving/serialisation of the configurations and loading/de-serialisations of the configs"""
 
     def __init__(self, mainGui):
         self._mainGui = mainGui

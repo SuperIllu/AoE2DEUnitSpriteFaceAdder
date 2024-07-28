@@ -13,7 +13,8 @@ from idlelib.tooltip import Hovertip
 
 class FaceModificationPanel:
     """
-    Shows the preview of the face mask with its modifications and enables the user to modify it
+    Shows the preview of the face mask with its modifications and enables the user to modify it or
+    remove all modifications
     """
 
     def __init__(self, master: PreviewPanelUI, on_mask_changed_callback):
@@ -22,7 +23,6 @@ class FaceModificationPanel:
         self._raw_face = None
         self._face_modifier = None
         self._build()
-
 
     def _build(self):
         self._faceMaskPanel = tk.Frame(self._previewPanel.getFrame())
@@ -44,8 +44,8 @@ class FaceModificationPanel:
                                           command=_on_checkbox_toggled)
         flipFaceCheckbox = tk.Checkbutton(self._faceMaskPanel, text="Mirror image",
                                             variable=self._flipImageVar,
-                                            command=lambda : print("togglee flip"))
-        flipFaceCheckbox.config(state=tk.DISABLED) # TODO mirroring currently not supported
+                                            command=lambda: print("togglee flip"))
+        flipFaceCheckbox.config(state=tk.DISABLED)  # TODO mirroring currently not supported
         self._faceMaskCanvas = tk.Canvas(self._faceMaskPanel, bg="white",
                                              width=PreviewPanelUI.PreviewWidth,
                                              height=PreviewPanelUI.PreviewHeight)

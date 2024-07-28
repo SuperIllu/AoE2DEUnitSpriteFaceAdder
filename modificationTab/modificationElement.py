@@ -13,6 +13,9 @@ from modificationTab.overlayPositionControls import OverlayPositionControls
 
 
 class ModificationElement:
+    """
+    the entire tab in which all the image modifications happen, including the file list
+    """
 
     def __init__(self, aoeGUI, parentFrame: tk.Frame):
         self._aoeGUI = aoeGUI
@@ -52,8 +55,6 @@ class ModificationElement:
         self._overlayPanel.grid(row=0, column=1, sticky="news", padx=(2, 2))
 
         self._overlayPanel.grid_columnconfigure(0, weight=1)
-
-        self._overlayPanel.bind('<Return>', lambda event: print("Enter"))
 
         self._buildFileInfoPanel()
         self._buildPreviewPanel()

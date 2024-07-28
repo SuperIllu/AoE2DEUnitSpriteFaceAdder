@@ -6,6 +6,10 @@ from managers.overlayImageManager import OverlayImageManager
 
 
 class ModificationOverlaySelectionPanel:
+    """
+    in this tkinter frame, the user can choose which face to overlay onto the sprites, or to not overlay any at all
+    (the face sprite will be positioned / modified in other frames, not here)
+    """
 
     def __init__(self, modificationElement, parentFrame, previewPanel):
         self._modificaitonElement = modificationElement

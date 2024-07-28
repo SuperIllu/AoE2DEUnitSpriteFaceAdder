@@ -4,6 +4,9 @@ from functions.Functions import trimStringToElementLength
 
 
 class FileInfoPanel:
+    """
+    shows which file and its corresponding mask are currently being worked on
+    """
 
     def __init__(self, parentFrame):
         self._parentFrame = parentFrame

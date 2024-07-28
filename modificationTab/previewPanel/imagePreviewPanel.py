@@ -10,6 +10,10 @@ from modificationTab.previewPanel.previewPanelUI import PreviewPanelUI
 
 
 class ImagePreviewPanel:
+    """
+    Shows the previews of the original image/mask/merged picture, as well as how it looks finished with
+    the face (and potentially face mask modifications) applied.
+    """
     PreviewWidth = 100
     PreviewHeight = 100
 
@@ -126,6 +130,11 @@ class ImagePreviewPanel:
         return position
 
     def moveOverlay(self, direction) -> tuple[int, int]:
+        """
+        called from the overlaypositioncontrol element telling this to update its images
+        :param direction:
+        :return:
+        """
         direction = direction.lower()
         directionMap = {"up": (0, -1), "down": (0, 1), "right": (1, 0), "left": (-1, 0)}
         directionVector = directionMap.get(direction, None)
