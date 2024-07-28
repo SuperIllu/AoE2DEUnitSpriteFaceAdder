@@ -99,8 +99,14 @@ class FileSelectionLoadTab:
 
         self._loadSummaryDetailTextArea.delete("1.0", tk.END)
         outputFolder = self._aoeGUI.outputFolderPathVar.get()
-        if not outputFolder or not os.path.exists(outputFolder):
+        if not outputFolder:
             self._loadSummaryDetailTextArea.insert(tk.END, f"Missing output folder\n\n")
+        elif not os.path.exists(outputFolder):
+            os.mkdir(outputFolder)
+            self._loadSummaryDetailTextArea.insert(tk.END, f"Created output folder {outputFolder}\n\n")
+        elif len(os.listdir(outputFolder)) != 0:
+            self._loadSummaryDetailTextArea.insert(tk.END, f"Output folder {outputFolder} not empty\n"
+                                                           f"Might get override\n\n")
 
         if not consistencyCheck[2]:
             self._loadSummaryDetailTextArea.insert(tk.END, "No overlay images loaded\n\n")

@@ -124,7 +124,7 @@ class ModificationElement:
     def resetConfiguration(self, fileName):
         self._imageConfigManager.deleteConfiguration(fileName)
 
-    def getCurrentImageConfig(self):
+    def getCurrentImageConfig(self) -> ImageConfiguration:
         return self._imageConfiguration
 
     def serialiseState(self):

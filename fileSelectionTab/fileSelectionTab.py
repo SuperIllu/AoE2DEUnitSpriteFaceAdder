@@ -1,7 +1,9 @@
+import os.path
 import tkinter as tk
 import tkinter.filedialog
 import tkinter.ttk as ttk
 import webbrowser
+from idlelib.tooltip import Hovertip
 
 from fileSelectionTab.fileSelectionLoadTab import FileSelectionLoadTab
 from fileSelectionTab.overlayImageSelection import OverlayImageSelectionPanel
@@ -19,6 +21,7 @@ class FileSelectionTab:
         self._aoeGUI = aoeGUI
         self._parentFrame = parentFrame
 
+
         self._buildUI()
 
     def _buildUI(self):
@@ -28,6 +31,7 @@ class FileSelectionTab:
         self._parentFrame.grid_rowconfigure(1, weight=1)
 
         self._folderIcon = tk.PhotoImage(file="./imgs/folder-icon_22.png")
+        self._autoOutputImage = tk.PhotoImage(file="./imgs/btn_white_dig_refresh_22.png")
 
         self._buildIntroPanel()
         self._buildSelectionPanel()
@@ -41,6 +45,7 @@ class FileSelectionTab:
 
         self._introFrame = tk.LabelFrame(self._parentFrame)
         self._introFrame.grid_columnconfigure(0, weight=1)
+        self._introFrame.grid_columnconfigure(1, weight=1)
         self._introFrame.grid_rowconfigure(0, weight=1)
         self._introFrame.grid_rowconfigure(1, weight=1)
         self._introFrame.grid_rowconfigure(2, weight=1)
@@ -48,41 +53,52 @@ class FileSelectionTab:
 
         self._introFrame.grid(row=0, column=0, columnspan=2, sticky="news", padx=(5, 5), pady=(5, 10))
 
-        label1 = tk.Label(self._introFrame,
+        intro_label = tk.Label(self._introFrame,
                           text="CHUM is a tool intended to help you overlay your face over units in AoE2:DE.")
-        label2 = tk.Label(self._introFrame,
+        latest_news_label = tk.Label(self._introFrame,
                           text="You can find the code and latest releases here:")
-        label3 = tk.Label(self._introFrame,
+        gitlab_link_label = tk.Label(self._introFrame,
                           text="github", fg="blue", cursor="hand2")
-        label3.bind("<Button-1>", lambda e: _openGithub())
-        BindTooltip(label3, url, wrapLength=350)
-        label4 = tk.Label(self._introFrame, text="Happy modifying")
+        gitlab_link_label.bind("<Button-1>", lambda e: _openGithub())
+        BindTooltip(gitlab_link_label, url, wrapLength=350)
+        happy_mod_label = tk.Label(self._introFrame, text="Happy modifying")
 
-        label1.grid(row=0, column=0, sticky="news", pady=(2, 0))
-        label2.grid(row=1, column=0, sticky="news")
-        label3.grid(row=2, column=0, sticky="news")
-        label4.grid(row=3, column=0, sticky="news", pady=(0, 2))
+        intro_label.grid(row=0, column=0, columnspan=2, sticky="news", pady=(2, 0))
+        latest_news_label.grid(row=1, column=0, columnspan=1, sticky="nes")
+        gitlab_link_label.grid(row=1, column=1, sticky="nws")
+        happy_mod_label.grid(row=2, column=0, columnspan=2, sticky="news", pady=(0, 2))
 
     def _buildSelectionPanel(self):
+        # configure own layout to place elements
         self._selectionPanel = tk.LabelFrame(self._parentFrame, text="Folder Selection")
         self._selectionPanel.grid(row=1, column=0, sticky="news", padx=(5, 5), pady=(5, 5))
         self._selectionPanel.grid_columnconfigure(0, weight=0)
         self._selectionPanel.grid_columnconfigure(1, weight=1)
         self._selectionPanel.grid_columnconfigure(2, weight=0)
 
+        #create elements
+        self._build_source_folder_frame()
+        outputFolderFrame = self._build_output_folder_frame()
+        maskFolderPanel = self._build_mask_folder_frame()
+        self._overlayPanel = OverlayImageSelectionPanel(self._aoeGUI, self._selectionPanel)
+
+        # place elements
+        maskFolderPanel.grid(row=1, column=0, columnspan=3, sticky="news", padx=(5, 5), pady=(15, 15))
+        outputFolderFrame.grid(row=2, column=0, columnspan=3, sticky="news", padx=(5, 5), pady=(3, 3))
+        self._overlayPanel.getFrame().grid(row=3, column=0, columnspan=3, sticky="news", pady=(10, 10), padx=(5, 5))
+
+    def _build_source_folder_frame(self):
         self._imageFolderVar = tk.StringVar()
         imageFolderLabel = tk.Label(self._selectionPanel, text="Image folder: ")
         imageFolderEntry = tk.Entry(self._selectionPanel, textvariable=self._imageFolderVar)
         imageFolderSelectionButton = tk.Button(self._selectionPanel, image=self._folderIcon,
                                                command=lambda: setFolderPath(self._imageFolderVar,
                                                                              "Select image folder"))
+        imageFolderLabel.grid(row=0, column=0)
+        imageFolderEntry.grid(row=0, column=1, sticky="ew", padx=(5, 5))
+        imageFolderSelectionButton.grid(row=0, column=2)
 
-        outputFolderLabel = tk.Label(self._selectionPanel, text="Output folder: ")
-        outputFolderEntry = tk.Entry(self._selectionPanel, textvariable=self._aoeGUI.outputFolderPathVar)
-        outputFolderSelectionButton = tk.Button(self._selectionPanel, image=self._folderIcon,
-                                                command=lambda: setFolderPath(self._aoeGUI.outputFolderPathVar,
-                                                                              "Select output folder"))
-
+    def _build_mask_folder_frame(self):
         maskFolderPanel = tk.LabelFrame(self._selectionPanel, text="Image masks")
         maskFolderPanel.grid_columnconfigure(1, weight=1)
         self._separateMaskFolderVar = tk.BooleanVar()
@@ -96,25 +112,36 @@ class FileSelectionTab:
         self._maskFolderSelectionButton = tk.Button(maskFolderPanel, state=tk.DISABLED, image=self._folderIcon,
                                                     command=lambda: setFolderPath(self._separateMaskFolderPathVar,
                                                                                   "Select separate mask folder"))
-
-        self._overlayPanel = OverlayImageSelectionPanel(self._aoeGUI, self._selectionPanel)
-
-        imageFolderLabel.grid(row=0, column=0)
-        imageFolderEntry.grid(row=0, column=1, sticky="ew", padx=(5, 5))
-        imageFolderSelectionButton.grid(row=0, column=2)
-
         separateMaskFolderCheckbox.grid(row=0, column=0, padx=(5, 5))
         autoGenerateMasks.grid(row=0, column=1, padx=(5, 5))
         maskFolderLabel.grid(row=1, column=0, padx=(5, 5))
         maskFolderEntry.grid(row=1, column=1, sticky="ew", padx=(5, 5))
         self._maskFolderSelectionButton.grid(row=1, column=2, padx=(5, 5), pady=(5, 5))
-        maskFolderPanel.grid(row=1, column=0, columnspan=3, stick="news", padx=(5, 5), pady=(15, 15))
+        return maskFolderPanel
 
-        outputFolderLabel.grid(row=2, column=0, padx=(5, 5))
-        outputFolderEntry.grid(row=2, column=1, sticky="ew", padx=(5, 5))
-        outputFolderSelectionButton.grid(row=2, column=2, padx=(5, 5))
+    def _build_output_folder_frame(self):
 
-        self._overlayPanel.getFrame().grid(row=3, column=0, columnspan=3, sticky="news", pady=(10, 10), padx=(5, 5))
+        def auto_generate_output_folder():
+            source_path = self._imageFolderVar.get()
+            if source_path and os.path.isdir(source_path):
+                output_path = source_path + "_out"
+                self._aoeGUI.outputFolderPathVar.set(output_path)
+
+        outputFolderFrame = tk.LabelFrame(self._selectionPanel, text="Output folder")
+        outputFolderFrame.grid_columnconfigure(1, weight=1)
+        outputFolderLabel = tk.Label(outputFolderFrame, text="Path: ")
+        outputFolderEntry = tk.Entry(outputFolderFrame, textvariable=self._aoeGUI.outputFolderPathVar)
+        outputFolderAutoButton = tk.Button(outputFolderFrame,
+                                           image=self._autoOutputImage, command=auto_generate_output_folder)
+        autoAutoputTooltip = Hovertip(outputFolderAutoButton, "Auto generate path")
+        outputFolderSelectionButton = tk.Button(outputFolderFrame, image=self._folderIcon,
+                                                command=lambda: setFolderPath(self._aoeGUI.outputFolderPathVar,
+                                                                              "Select output folder"))
+        outputFolderLabel.grid(row=0, column=0, padx=(5, 5))
+        outputFolderEntry.grid(row=0, column=1, sticky="ew", padx=(5, 5))
+        outputFolderAutoButton.grid(row=0, column=2)
+        outputFolderSelectionButton.grid(row=0, column=3, padx=(5, 5))
+        return outputFolderFrame
 
     def _buildButtonPanel(self):
         self._loadTab = FileSelectionLoadTab(self._aoeGUI, self._overlayPanel, self._parentFrame,

@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.ttk
 
 from functions.Functions import loadImageToCanvas
 from imageInspector import linkImageInspector
@@ -20,6 +21,8 @@ class PreviewPanelUI:
         self._previewPanelFrame.grid_columnconfigure(0, weight=1)
         self._previewPanelFrame.grid_columnconfigure(1, weight=1)
         self._previewPanelFrame.grid_columnconfigure(2, weight=1)
+        self._previewPanelFrame.grid_columnconfigure(3, weight=0)  # vertical line
+        self._previewPanelFrame.grid_columnconfigure(4, weight=1)  # reserved for face mod panel
 
         baseImageLabel = tk.Label(self._previewPanelFrame, text="Base Image")
         baseMaskLabel = tk.Label(self._previewPanelFrame, text="Base Mask")
@@ -66,7 +69,13 @@ class PreviewPanelUI:
 
         autoGenerateOverlayMaskCheckbox.grid(row=4, column=0, columnspan=3)
 
-    def getFrame(self):
+        # draw vertical line
+        (tkinter.ttk.Separator(self._previewPanelFrame, orient=tkinter.VERTICAL).
+         grid(column=3, row=0, rowspan=4, sticky="ns"))
+
+
+
+    def getFrame(self) -> tk.LabelFrame:
         return self._previewPanelFrame
 
     def _updateAutoGenerateFlag(self):
@@ -85,6 +94,7 @@ class PreviewPanelUI:
         return loadImageToCanvas(image, self._baseResultCanvas)
 
     def loadMergedImage(self, image):
+        linkImageInspector(self._overlayImageCanvas, image, "Merged result")
         return loadImageToCanvas(image, self._overlayImageCanvas)
 
     def loadMergedMask(self, image):

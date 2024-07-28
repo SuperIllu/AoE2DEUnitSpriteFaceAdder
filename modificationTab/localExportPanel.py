@@ -35,6 +35,8 @@ class LocalExportPanel:
     def exportImage(self):
         selectedFile = self._modificationElement.getSelectedFile()
         folderPath = self._modificationElement.getOutputFolderPath()
+        if not os.path.exists(folderPath):
+            os.mkdir(folderPath)
         image = self._previewPanel.getMergedImage()
         if selectedFile and folderPath and image:
             targetPath = f"{folderPath}{os.path.sep}{selectedFile[0]}"

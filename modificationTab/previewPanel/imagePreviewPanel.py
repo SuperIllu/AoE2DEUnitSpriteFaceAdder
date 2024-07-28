@@ -1,8 +1,11 @@
 from PIL import Image
 import tkinter as tk
 
+from functions.Functions import print_image_pixels
+from functions.faceMaskUtils import apply_face_mask_mods
 from functions.imageMerger import mergeImages, createResultImage, generateDeltaMask
 from managers.imageConfigManager import ImageConfiguration
+from modificationTab.previewPanel.faceModificationPanel import FaceModificationPanel
 from modificationTab.previewPanel.previewPanelUI import PreviewPanelUI
 
 
@@ -25,6 +28,8 @@ class ImagePreviewPanel:
         self._autoGenerateOverlayMaskVar = tk.BooleanVar()
         self._autoGenerateOverlayMaskVar.set(True)
         self._previewPanelFrame = PreviewPanelUI(self, self._parentFrame, self._autoGenerateOverlayMaskVar)
+        self._faceModificationFrame = FaceModificationPanel(self._previewPanelFrame, self._updateMergedImage)
+
 
     def getFrame(self):
         return self._previewPanelFrame.getFrame()
@@ -39,7 +44,9 @@ class ImagePreviewPanel:
         """ Called (indirectly) from the list element """
         self._autoGenerateOverlayMaskVar.set(configuration.autoGenerateMask)
         overlayImagePath = self._modificationPanel.OverlayImageManager.getImageForIndex(configuration.overlayImageIndex)
-        self._overlayImage = Image.open(overlayImagePath)
+        self._overlayImage: Image.ImageFile = Image.open(overlayImagePath)
+
+        self._faceModificationFrame.loadFace(configuration, self._overlayImage)
 
         self._baseImage, self._baseMask = \
             self._modificationPanel.ImageConfigManager.getImageAndMask(configuration.imageName)
@@ -69,6 +76,9 @@ class ImagePreviewPanel:
                 fullOverlayImageFilePath = self._modificationPanel.OverlayImageManager. \
                     getImageForIndex(configuration.overlayImageIndex)
                 overlayImage = Image.open(fullOverlayImageFilePath)
+
+                # apply modifications to face before merging pics
+                overlayImage = apply_face_mask_mods(overlayImage, configuration)
 
                 self._mergedImage = mergeImages(self._baseImage, overlayImage, configuration.offset)
 

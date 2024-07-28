@@ -22,7 +22,7 @@ class AoeUnitGui:
         self._main.grid_rowconfigure(0, weight=0)
         self._main.grid_rowconfigure(1, weight=1)
 
-        self._titleLabel = tk.Label(self._main, text="Aaaaaa")
+        #self._titleLabel = tk.Label(self._main, text="Aaaaaa")
         self._tabs = ttk.Notebook(self._main)
         self._tabs.grid(row=1, column=0, sticky="news")
 

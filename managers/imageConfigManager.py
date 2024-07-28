@@ -1,8 +1,10 @@
 import dataclasses
-from typing import Optional
+from typing import Optional, Any, Type
 from dataclasses import dataclass
 
 from PIL import Image
+
+from functions.faceMaskUtils import FaceMaskConfig
 from functions.imageMerger import mergeImages, generateDeltaMask
 from managers.imageFileManager import ImageFileManager
 from managers.overlayImageManager import OverlayImageManager
@@ -10,11 +12,13 @@ from managers.overlayImageManager import OverlayImageManager
 
 @dataclass(order=True)
 class ImageConfiguration:
-    imageName: Image
+    imageName: str
     hasOverlay: bool = True
     overlayImageIndex: int = 0
     offset: tuple[int, int] = (0, 0)
     autoGenerateMask: bool = True
+    faceMask: FaceMaskConfig = None
+
 
     def serialise(self):
         return dataclasses.asdict(self)
@@ -88,6 +92,33 @@ class ImageConfigurationManager:
                 self._deserialiseEntry(configEntry)
 
     def _deserialiseEntry(self, entry: dict):
-        self._configurationMap[entry['imageName']] = ImageConfiguration(**entry)
+        # config_entry = ImageConfiguration(**entry)
+        config_entry = self._parse_nested_data_classes(ImageConfiguration, entry)
+        self._configurationMap[entry['imageName']] = config_entry
+
+    def _parse_nested_data_classes(self, data_class: Type[Any], data: dict):
+        """
+        Recursively convert a dictionary into a dataclass instance.
+        """
+        if not hasattr(data_class, '__dataclass_fields__'):
+            return data  # If it's not a dataclass, return the data as is
+
+        fieldtypes = {f.name: f.type for f in data_class.__dataclass_fields__.values()}
+        kwargs = {}
+
+        for field_name, field_type in fieldtypes.items():
+            try:
+                # Recursively handle each field
+                data_value = data[field_name]
+                if data_value is None:
+                    kwargs[field_name] = None
+                else:
+                    kwargs[field_name] = self._parse_nested_data_classes(field_type, data_value)
+            except Exception as e:
+                # Log the problematic field and its data
+                print(f"Error while processing field '{field_name}' with data: {data.get(field_name, 'N/A')}")
+                raise e
+
+        return data_class(**kwargs)
 
 
