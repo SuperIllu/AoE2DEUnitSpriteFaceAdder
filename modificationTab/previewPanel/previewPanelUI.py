@@ -2,13 +2,12 @@ import tkinter as tk
 import tkinter.ttk
 
 from functions.Functions import loadImageToCanvas
-from imageInspector import linkImageInspector
+from imageInspector import link_image_inspector
 
 
 class PreviewPanelUI:
     PreviewWidth = 100
     PreviewHeight = 100
-
 
     def __init__(self, imagePreviewPanel, parentFrame, autoGenerateMaskVar):
         self._parentFrame = parentFrame
@@ -74,7 +73,6 @@ class PreviewPanelUI:
          grid(column=3, row=0, rowspan=4, sticky="ns"))
 
 
-
     def getFrame(self) -> tk.LabelFrame:
         return self._previewPanelFrame
 
@@ -82,19 +80,19 @@ class PreviewPanelUI:
         self._imagePreviewPanel.updateAutoGenerateFlag(self._autoGenerateOverlayMaskVar.get())
 
     def loadBaseImage(self, image):
-        linkImageInspector(self._baseImageCanvas, image, "Base image")
+        link_image_inspector(self._baseImageCanvas, image, "Base image")
         return loadImageToCanvas(image, self._baseImageCanvas)
 
     def loadBaseMask(self, image):
-        linkImageInspector(self._baseMaskCanvas, image, "Base mask")
+        link_image_inspector(self._baseMaskCanvas, image, "Base mask")
         return loadImageToCanvas(image, self._baseMaskCanvas)
 
     def loadBaseResult(self, image):
-        linkImageInspector(self._baseResultCanvas, image, "Base result")
+        link_image_inspector(self._baseResultCanvas, image, "Base result")
         return loadImageToCanvas(image, self._baseResultCanvas)
 
     def loadMergedImage(self, image):
-        linkImageInspector(self._overlayImageCanvas, image, "Merged result")
+        link_image_inspector(self._overlayImageCanvas, image, "Merged result")
         return loadImageToCanvas(image, self._overlayImageCanvas)
 
     def loadMergedMask(self, image):
