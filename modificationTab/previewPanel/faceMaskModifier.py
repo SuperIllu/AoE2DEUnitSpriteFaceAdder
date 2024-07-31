@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import math
 import tkinter as tk
 from itertools import product
@@ -34,11 +36,17 @@ class FaceMaskModifier:
         self._on_masked_changed = None
         self._buildUI()
 
-    @staticmethod
-    def get_instance():
-        if FaceMaskModifier._instance is None:
-            FaceMaskModifier._instance = FaceMaskModifier()
-        return FaceMaskModifier._instance
+    @classmethod
+    def get_instance(cls) -> FaceMaskModifier:
+        """ creates and instance if necessary, or returns the existing one """
+        if cls._instance is None:
+            cls._instance = FaceMaskModifier()
+        return cls._instance
+
+    @classmethod
+    def check_and_get(cls) -> FaceMaskModifier:
+        """ only gets the reference, does not create one"""
+        return cls._instance
 
 
     def _buildUI(self):
@@ -93,7 +101,6 @@ class FaceMaskModifier:
         self._main.protocol("WM_DELETE_WINDOW", self._on_close)
 
     def _on_close(self):
-        print("closing face mask")
         FaceMaskModifier._instance = None
         self._main.destroy()
 
@@ -198,6 +205,8 @@ class FaceMaskModifier:
         self._update_image_visuals()
 
     def load_mask(self, image: Image, config: ImageConfiguration, on_mask_changed):
+        assert self._canvas and self._canvas.winfo_exists(), "canvas is gone"
+
         self._config = config
         self._on_masked_changed = on_mask_changed
         self._face_image = image

@@ -78,12 +78,12 @@ class ImagePreviewPanel:
                 print("No configuration -> skip")
                 return
 
-            if self._config.hasOverlay:
-                fullOverlayImageFilePath = self._modificationPanel.OverlayImageManager. \
-                    getImageForIndex(self._config.overlayImageIndex)
-                # update reference so it can be forwarded to preview panel
-                self._overlayImage = Image.open(fullOverlayImageFilePath)
+            # update reference (even if not used) so it can be forwarded to preview panel
+            fullOverlayImageFilePath = self._modificationPanel.OverlayImageManager. \
+                getImageForIndex(self._config.overlayImageIndex)
+            self._overlayImage = Image.open(fullOverlayImageFilePath)
 
+            if self._config.hasOverlay:
                 # apply modifications to face before merging pics
                 masked_overlay = apply_face_mask_mods(self._overlayImage, self._config)
 

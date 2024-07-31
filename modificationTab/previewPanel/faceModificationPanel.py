@@ -83,7 +83,6 @@ class FaceModificationPanel:
         face_mask_config.mask_image = face_mask_as_bytes[1]
         self._config.faceMask = face_mask_config
 
-        face_after_mask = subtract_images(self._raw_face, face_mask)
         self._update_face_preview()
         self._update_merged_preview()
 
@@ -92,22 +91,24 @@ class FaceModificationPanel:
         self._useFaceMaskVar.set(False)
         self._update_face_preview()
         self._update_merged_preview()
-        if self._face_modifier:
-            self._face_modifier.update_visuals()
+        modifier = FaceMaskModifier.check_and_get()
+        modifier and modifier.update_visuals()
 
     def getFrame(self) -> tk.Frame:
         return self._faceMaskPanel
 
-    def loadFace(self, config: ImageConfiguration, image) -> None:
+    def loadFace(self, config: ImageConfiguration, overlay_image: Image) -> None:
+        assert overlay_image is not None, "None overlay_image given"
+        assert isinstance(overlay_image, Image.Image), f"face image is wrong type {type(overlay_image)}"
+
         self._config = config
-        self._raw_face = image
+        self._raw_face = overlay_image
 
         self._useFaceMaskVar.set(self._config.faceMask is not None and self._config.faceMask.use_mask)
 
         self._update_face_preview()
-        if self._face_modifier:
-            # zoomed in view already open -> update
-            self._face_modifier.load_mask(self._raw_face, self._config, self._on_face_mask_changed)
+        modifier = FaceMaskModifier.check_and_get()
+        modifier and modifier.load_mask(self._raw_face, self._config, self._on_face_mask_changed)
 
     def _update_face_preview(self):
         # shows mask even if flag is turned off

@@ -22,10 +22,14 @@ def timeit(func):
         return result
     return timeit_wrapper
 
-def getCanvasSize(canvas) -> tuple[int, int]:
+
+def getCanvasSize(canvas: tkinter.Canvas) -> tuple[int, int]:
+    # don't use winfo_width()/height(), doesn't work for some reason
+    assert canvas is not None and canvas.winfo_exists(), f"canvas in a bad state: {canvas}"
     canvasWidth = int(canvas["width"])
     canvasHeight = int(canvas["height"])
     return (canvasWidth, canvasHeight)
+
 
 
 def calculatePreviewImageSize(canvasSize, previewImage) -> tuple[int, int]:
