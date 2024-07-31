@@ -26,6 +26,8 @@ class ImagePreviewPanel:
         self._overlayOffset = None
         self._mergedImage = None
         self._mergedMask = None
+        self._config = None
+        self._overlayImage = None
         self._overlayOffset = (0, 0)
 
     def _buildUI(self):
@@ -46,6 +48,7 @@ class ImagePreviewPanel:
 
     def loadImageToPreview(self, configuration: ImageConfiguration):
         """ Called (indirectly) from the list element """
+        self._config = configuration
         self._autoGenerateOverlayMaskVar.set(configuration.autoGenerateMask)
         overlayImagePath = self._modificationPanel.OverlayImageManager.getImageForIndex(configuration.overlayImageIndex)
         self._overlayImage: Image.ImageFile = Image.open(overlayImagePath)
@@ -71,20 +74,20 @@ class ImagePreviewPanel:
     def _updateMergedImage(self):
         """ creates new images when any overlay information is changed """
         if self._baseImage:
-            configuration = self._modificationPanel.getCurrentImageConfig()
-            if configuration is None:
+            if self._config is None:
                 print("No configuration -> skip")
                 return
 
-            if configuration.hasOverlay:
+            if self._config.hasOverlay:
                 fullOverlayImageFilePath = self._modificationPanel.OverlayImageManager. \
-                    getImageForIndex(configuration.overlayImageIndex)
-                overlayImage = Image.open(fullOverlayImageFilePath)
+                    getImageForIndex(self._config.overlayImageIndex)
+                # update reference so it can be forwarded to preview panel
+                self._overlayImage = Image.open(fullOverlayImageFilePath)
 
                 # apply modifications to face before merging pics
-                overlayImage = apply_face_mask_mods(overlayImage, configuration)
+                masked_overlay = apply_face_mask_mods(self._overlayImage, self._config)
 
-                self._mergedImage = mergeImages(self._baseImage, overlayImage, configuration.offset)
+                self._mergedImage = mergeImages(self._baseImage, masked_overlay, self._config.offset)
 
                 if self._autoGenerateOverlayMaskVar.get():
                     self._mergedMask = generateDeltaMask(self._baseImage, self._mergedImage, self._baseMask)
@@ -113,8 +116,23 @@ class ImagePreviewPanel:
     def getMergedMask(self):
         return self._mergedMask
 
-    def updateFromConfiguration(self):
+    def overlay_image_updated(self, face_changed: bool):
+        """
+        Called from the overlay selection, when either the face image selection has been changed,
+        or using of an image has been toggled
+        :param face_changed: a different face has been selected
+        :return:
+        """
+        if self._overlayImage is None:
+            print("update avoided")
+            # this exists only for loading a saved config, as that triggers a setting of values in the UI
+            return
+
+        if face_changed and self._config.faceMask:
+            # new face -> old mask can not apply, but keep other settings
+            self._config.faceMask.mask_image = None
         self._updateMergedImage()
+        self._faceModificationFrame.loadFace(self._config, self._overlayImage)
 
     def getOverlayOffset(self) -> tuple[int, int]:
         config = self._modificationPanel.getCurrentImageConfig()
@@ -145,4 +163,4 @@ class ImagePreviewPanel:
             self._modificationPanel.getCurrentImageConfig().offset = newPosition
             self._updateMergedImage()
             return newPosition
-        return None
+        raise Exception(f"Invalid move direction {direction}")

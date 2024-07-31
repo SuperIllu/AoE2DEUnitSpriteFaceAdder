@@ -77,12 +77,12 @@ class ModificationOverlaySelectionPanel:
 
     def _toggleUseOverlayImage(self):
         self._modificaitonElement.getCurrentImageConfig().hasOverlay = self._useOverlayVar.get()
-        self._previewPanel.updateFromConfiguration()
+        self._previewPanel.overlay_image_updated(False)
 
     def _newOverlaySelected(self, imageIndex: int):
         self._displayImageNameByIndex(imageIndex)
         self._modificaitonElement.getCurrentImageConfig().overlayImageIndex = imageIndex
-        self._previewPanel.updateFromConfiguration()
+        self._previewPanel.overlay_image_updated(True)
 
     def _displayImageNameByIndex(self, imageIndex: int) -> str:
         displayName = self._overlayImageManager.getDisplayNameFromIndex(imageIndex)

@@ -74,6 +74,9 @@ def bytes_to_face_mask(dimensions, data: str) -> Image:
 
 
 def apply_face_mask_mods(face_image: Image, config, ignore_on: bool = False) -> Image:
+    if config is None:
+        # this is only here for the inital loading
+        return face_image
     # TODO mirroring currently not supported
     if config.faceMask is None or not config.faceMask.mask_image:
         # mask exists
@@ -134,14 +137,16 @@ def add_masked_image_pixels(output_pixels, image_pixels, position, scale_factor)
     """ this functions handles the multiple pixels for each upscale pixel
         adds a modified version of the pixel onto the ouput to indicate that is has been masked
     """
+    if image_pixels[position][-1] == 0:
+        # skip transparent pixels for performance reasons
+        return
+
     mask_colour = (255, 0, 0)  # red dots indicating the pixel behing hidden
 
     x_range = range(0, scale_factor)
     y_range = range(0, scale_factor)
     for pixel_index in product(x_range, y_range):
-        if image_pixels[position][-1] == 0:
-            # skip transparent pixels for performance reasons
-            continue
+
         global_pixel_index = (position[0] * scale_factor + pixel_index[0], position[1] * scale_factor + pixel_index[1])
         if _should_be_red(pixel_index[0], pixel_index[1]):
             output_pixels[global_pixel_index] = mask_colour
@@ -149,22 +154,38 @@ def add_masked_image_pixels(output_pixels, image_pixels, position, scale_factor)
             output_pixels[global_pixel_index] = image_pixels[position]
 
 
+def _print_mask(pixels, dx, dy):
+    """
+    prints a mask as 0/1 strings
+    :param pixels:
+    :param dx:
+    :param dy:
+    :return:
+    """
+    print(dx)
+    print(dy)
+    for x in range(0, dx):
+        for y in range(0, dy):
+            char = 1 if pixels[x, y] > 0 else 0
+            print(char, end="")
+        print("")
+    print("")
+
+
 def mark_subtracted_images(face_image: Image, mask: Image, scaling: int) -> Image:
     """
-    this takes an **unscaled** image and **unscaled** mask and marks its images with a certain
+    this takes an **unscaled** image and **unscaled** mask and marks its masked pixels with a certain
      colour to show that they will be masked
     :param face_image:
     :param mask:
     :return:
     """
     scaling = int(scaling)
-
     if scaling <= 1:
         raise Exception(f"Image not up-scaled at all (f={scaling})")
 
-    # the colour in the mask indicating that this pixel should be hidden
-    # here it shows that this pixel should be marked
-    mask_colour = (0, 0, 0)
+    if face_image.mode != "RGBA":
+        raise Exception(f"[mark_sub] bad image mode {face_image.mode}, should be RGBA")
 
     scaled_image_size = (int(face_image.size[0] * scaling), int(face_image.size[1] * scaling))
     # needs to contain alpha as some face sprites have weird alpha values (black and white pixels with a=0)

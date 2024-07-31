@@ -22,6 +22,7 @@ class FaceModificationPanel:
         self._update_merged_preview = on_mask_changed_callback
         self._raw_face = None
         self._face_modifier = None
+        self._config = None
         self._build()
 
     def _build(self):
