@@ -124,7 +124,6 @@ class ImagePreviewPanel:
         :return:
         """
         if self._overlayImage is None:
-            print("update avoided")
             # this exists only for loading a saved config, as that triggers a setting of values in the UI
             return
 
