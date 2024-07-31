@@ -41,7 +41,7 @@ def calculatePreviewImageSize(canvasSize, previewImage) -> tuple[int, int]:
     return int(picWidth * scaleFactor), int(picHeight * scaleFactor)
 
 
-@timeit
+#@timeit
 def loadImageToCanvas(imagePreview: Image, canvas: tkinter.Canvas, resample=None):
     """ does not resize the original image, returns a resized copy """
     if imagePreview:

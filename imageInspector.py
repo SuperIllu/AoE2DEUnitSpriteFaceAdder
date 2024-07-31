@@ -5,14 +5,19 @@ from PIL import Image
 from functions.Functions import loadImageToCanvas, calculatePreviewImageSize, getCanvasSize
 
 
-def link_image_inspector(element, image: Image, image_name: str, on_closed_callback=None):
-    element.bind("<Button-2>", lambda event: ImageInspector(image, image_name, on_closed_callback))
+def link_image_inspector(element, image: Image, image_name: str,
+                         on_open=None, on_closed_callback=None,
+                         open_condition=None
+                         ):
+    def _open():
+        if open_condition is None or open_condition():
+            ImageInspector(image, image_name, on_open, on_closed_callback)
+    element.bind("<Button-2>", lambda event: _open())
 
 
 class ImageInspector:
 
-    def __init__(self, image: Image, image_name: str, on_closed_callback):
-        self._image = image
+    def __init__(self, image: Image, image_name: str, on_open, on_closed_callback):
         self._image_name = image_name
         self._pixels = image.load()
         self._on_closed_callback = on_closed_callback
@@ -24,11 +29,7 @@ class ImageInspector:
         self._main.grid_columnconfigure(0, weight=1)
 
         self._canvas = tk.Canvas(self._main, width=600, height=600)
-        target_size = calculatePreviewImageSize(getCanvasSize(self._canvas), image)
-        self._canvas.config(width=target_size[0], height=target_size[1])
-        self._resized_image, self._resized_photoimage = loadImageToCanvas(self._image, self._canvas,
-                                                                          resample=PIL.Image.NEAREST)
-        self._scaled_pixels = self._resized_image.load()
+        self.load_image(image)
 
         self._canvas.bind("<Motion>", self._evaluate_mouse_position)
         self._colourVar = tk.StringVar()
@@ -41,6 +42,17 @@ class ImageInspector:
         position_label.grid(row=2, column=0)
 
         self._main.protocol("WM_DELETE_WINDOW", self._on_close)
+
+        if on_open:
+            on_open(self)
+
+    def load_image(self, image):
+        self._image = image
+        target_size = calculatePreviewImageSize(getCanvasSize(self._canvas), image)
+        self._canvas.config(width=target_size[0], height=target_size[1])
+        self._resized_image, self._resized_photoimage = loadImageToCanvas(self._image, self._canvas,
+                                                                          resample=PIL.Image.NEAREST)
+        self._scaled_pixels = self._resized_image.load()
 
     def _on_close(self):
         self._main.destroy()

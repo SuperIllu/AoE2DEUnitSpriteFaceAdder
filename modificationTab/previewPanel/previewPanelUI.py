@@ -2,7 +2,7 @@ import tkinter as tk
 import tkinter.ttk
 
 from functions.Functions import loadImageToCanvas
-from imageInspector import link_image_inspector
+from imageInspector import link_image_inspector, ImageInspector
 
 
 class PreviewPanelUI:
@@ -13,6 +13,7 @@ class PreviewPanelUI:
         self._parentFrame = parentFrame
         self._imagePreviewPanel = imagePreviewPanel
         self._autoGenerateOverlayMaskVar = autoGenerateMaskVar
+        self._inspectors: dict = {}
         self._buildUI()
 
     def _buildUI(self):
@@ -80,23 +81,56 @@ class PreviewPanelUI:
         self._imagePreviewPanel.updateAutoGenerateFlag(self._autoGenerateOverlayMaskVar.get())
 
     def loadBaseImage(self, image):
-        link_image_inspector(self._baseImageCanvas, image, "Base image")
+        self._link_or_update_inspector(image, self._baseImageCanvas,
+                                       "Base Image", "_base_img_")
         return loadImageToCanvas(image, self._baseImageCanvas)
 
     def loadBaseMask(self, image):
-        link_image_inspector(self._baseMaskCanvas, image, "Base mask")
+        self._link_or_update_inspector(image, self._baseMaskCanvas,
+                                       "Base mask", "_base_mask_")
         return loadImageToCanvas(image, self._baseMaskCanvas)
 
     def loadBaseResult(self, image):
-        link_image_inspector(self._baseResultCanvas, image, "Base result")
+        self._link_or_update_inspector(image, self._baseResultCanvas,
+                                       "Base result", "_base_result_")
         return loadImageToCanvas(image, self._baseResultCanvas)
 
     def loadMergedImage(self, image):
-        link_image_inspector(self._overlayImageCanvas, image, "Merged result")
+        self._link_or_update_inspector(image, self._overlayImageCanvas,
+                                       "Merged Image", "_merged_img_")
         return loadImageToCanvas(image, self._overlayImageCanvas)
 
     def loadMergedMask(self, image):
+        self._link_or_update_inspector(image, self._overlayMaskCanvas,
+                                       "Merged mask", "_merged_mask_")
         return loadImageToCanvas(image, self._overlayMaskCanvas)
 
     def loadMergedResult(self, image):
+        self._link_or_update_inspector(image, self._overlayResultCanvas,
+                                       "Merged result", "_merged_result_")
         return loadImageToCanvas(image, self._overlayResultCanvas)
+
+    def _link_or_update_inspector(self, image, canvas, image_name, tag):
+        inspector: ImageInspector = self._inspectors.get(tag, None)
+        if inspector:
+            # update already open inspector
+            inspector.load_image(image)
+        else:
+            # no inspector open -> open a new instance
+            self._link_inspector(image, canvas, image_name, tag)
+
+    def _link_inspector(self, image, canvas, image_name: str, tag: str):
+        def _remember_inspector(inspector, tag_: str):
+            self._inspectors[tag_] = inspector
+
+        def _forget_inspector(tag_: str):
+            del self._inspectors[tag_]
+
+        def _can_open_inspector(tag_: str):
+            return self._inspectors.get(tag_, None) is None
+
+        link_image_inspector(canvas, image, image_name,
+                             lambda insp: _remember_inspector(insp, tag),
+                             lambda: _forget_inspector(tag),
+                             lambda: _can_open_inspector(tag)
+                             )
