@@ -49,6 +49,9 @@ Position the face over the unit's face:
 You can export single images or the entire list:
 * All images that were opened count as modified, even if you didn't move the default face image position
 
+### Turn back into SMX file
+See description above how to turn the bmp files back into smx via the SLX studio.
+
 ### Create a local mod
 In order for the changes to show up in the game, you need to create a new mod.
 Under the path 

@@ -211,8 +211,9 @@ class FaceMaskModifier:
         self._on_masked_changed = on_mask_changed
         self._face_image = image
         self._face_pixels = image.load()
+        self._canvas.configure(width=400, height=400)
 
-        target_size = calculatePreviewImageSize(getCanvasSize(self._canvas), image)
+        target_size = calculatePreviewImageSize((400, 400), image)
         self._canvas.config(width=target_size[0], height=target_size[1])
         # do one initial load to get the resized image, needed to determine the scaling
         self._resizedImage, self._resizedPhotomage = loadImageToCanvas(self._face_image, self._canvas,

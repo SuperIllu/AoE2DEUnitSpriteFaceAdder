@@ -67,11 +67,13 @@ class ImageConfigurationManager:
             return (imageImage, maskImage)
 
         configuration = self.getConfiguration(imageName)
+        has_overlay = configuration.hasOverlay
         overlayImagePath = self._overlayManager.getImageForIndex(configuration.overlayImageIndex)
         overlayImage = Image.open(overlayImagePath)
         overlayImageOffset = configuration.offset
 
-        if not (overlayImage and overlayImageOffset):
+        apply_overlay = has_overlay and (overlayImage is not None and overlayImage != "")
+        if not apply_overlay:
             # return unmodified images
             return (imageImage, maskImage)
 
